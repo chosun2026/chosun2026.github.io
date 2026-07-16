@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Prompt Diff — titles_v2_g25flite.jinja</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: "Press Start 2P", monospace;
+    font-size: 12px;
+    line-height: 2.2;
+    background: #1a1a2e;
+    padding: 36px 28px 72px;
+    color: #e2e8f0;
+    max-width: 960px;
+    margin: 0 auto;
+  }
+
+  h1 {
+    font-size: 14px;
+    color: #e2e8f0;
+    margin-bottom: 6px;
+    text-shadow: 2px 2px 0 #4a5568;
+  }
+  h1::after {
+    content: "█";
+    animation: blink 1s step-end infinite;
+    margin-left: 4px;
+    color: #4ade80;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .subtitle {
+    font-size: 9px;
+    color: #94a3b8;
+    margin-bottom: 36px;
+  }
+
+  /* section header */
+  .section-heading {
+    font-size: 9px;
+    color: #94a3b8;
+    border-top: 3px solid #334155;
+    padding-top: 18px;
+    margin-bottom: 14px;
+    margin-top: 8px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+  }
+  .section-heading::before {
+    content: "► ";
+    color: #4ade80;
+  }
+
+  /* ── green card ── */
+  .after-card, .new-only {
+    background: #0f2318;
+    border: 4px solid #16a34a;
+    box-shadow: 6px 6px 0 #052e16;
+    padding: 20px;
+    margin-bottom: 22px;
+    position: relative;
+    clip-path: polygon(
+      0 8px, 8px 0,
+      calc(100% - 8px) 0, 100% 8px,
+      100% calc(100% - 8px), calc(100% - 8px) 100%,
+      8px 100%, 0 calc(100% - 8px)
+    );
+  }
+
+  .card-label {
+    font-size: 9px;
+    color: #86efac;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .after-card .card-label::before { content: "▶"; color: #4ade80; font-size: 10px; }
+  .new-only   .card-label::before { content: "★"; color: #4ade80; font-size: 10px; }
+
+  .after-text {
+    color: #d1fae5;
+    font-size: 12px;
+    line-height: 2.2;
+  }
+
+  /* key changed text pops in yellow, larger */
+  .after-text strong, .new-only .after-text strong {
+    color: #fef08a;
+    font-size: 14px;
+  }
+
+  em { font-style: normal; text-decoration: underline; }
+
+  .wrong   { color: #f87171; }
+  .correct { color: #4ade80; }
+</style>
+</head>
+<body>
+
+<h1>PR #1391 CHANGES</h1>
+<p class="subtitle">titles_v2_g25flite.jinja</p>
+
+<!-- ═══════════════════ 1 — Unique Features ═══════════════════ -->
+<p class="section-heading">Unique Features &amp; Benefits</p>
+<div class="after-card">
+  <div class="card-label">NEW VERSION</div>
+  <div class="after-text">
+    Highlight key features that differentiate the product. <strong>Be very skeptical of the original title.</strong> "Handmade" should not appear if not in the item description. <strong>Never use "Custom" as shorthand for "made-to-order."</strong> Only use "Custom" if the buyer can specify their own text, design, name, or dimensions. A product with preset variations is NOT custom. <strong>Do not include "digital" if the item is available in physical form.</strong>
+  </div>
+</div>
+
+<!-- ═══════════════════ 2 — Etsy Platform Context ═══════════════════ -->
+<p class="section-heading">Etsy Platform Context</p>
+<div class="after-card">
+  <div class="card-label">NEW VERSION</div>
+  <div class="after-text">
+    Craft a title that works well in Etsy search. <strong>Prioritize search-relevant terms over evocative or decorative language.</strong> Favor concrete, specific descriptors (material, style, technique) over vague adjectives.
+  </div>
+</div>
+
+<!-- ═══════════════════ 3 — Conciseness ═══════════════════ -->
+<p class="section-heading">Conciseness and Readability</p>
+<div class="after-card">
+  <div class="card-label">NEW VERSION</div>
+  <div class="after-text">
+    The title must be no longer than 12 words. <strong>Fewer words is always better when meaning is preserved</strong> — if unsure whether to include a word, leave it out. Eliminate redundant words and close synonyms. Every word must add distinct value that no other word already covers.
+  </div>
+</div>
+
+<!-- ═══════════════════ 4 — NEW: Comma phrases ═══════════════════ -->
+<p class="section-heading">New Bullet — Comma-Sep. Phrases</p>
+<div class="new-only">
+  <div class="card-label">NEW</div>
+  <div class="after-text">
+    <strong>Do not combine comma-separated phrases from the original.</strong> Many Etsy titles are lists of keyword phrases (e.g., "Dog Portrait, Dog Wall Art, Dog Gift"). Do not merge them all — that produces a keyword-stuffed result. Identify the single best phrase and build a concise title around it. If the same word appears across multiple phrases, use it exactly once. <strong>Never output the original title unchanged.</strong>
+  </div>
+</div>
+
+<!-- ═══════════════════ 5 — NEW: Tribal IP ═══════════════════ -->
+<p class="section-heading">New Bullet — Tribal / IP</p>
+<div class="new-only">
+  <div class="card-label">NEW</div>
+  <div class="after-text">
+    <strong>Tribal/cultural/protected IP:</strong> Do not use tribal, indigenous, or ethnicity-specific designations (e.g., "Navajo," "Native American") unless they appear verbatim in the original seller title. These terms carry legal and policy implications and should not be inferred from tags, descriptions, or images.
+  </div>
+</div>
+
+<!-- ═══════════════════ 6 — NEW: Examples 7 & 8 ═══════════════════ -->
+<p class="section-heading">New Examples 7 &amp; 8</p>
+<div class="new-only">
+  <div class="card-label">NEW</div>
+  <div class="after-text">
+    <p><strong>EX 7 — Comma list:</strong><br>
+    Original: Custom Pet Portrait, Funny Dog Bathroom Art, Dog Wall Art, Dog Reading Newspaper on Toilet<br>
+    <span class="wrong">✗ Wrong: Custom Pet Portrait, Dog Cat Loss Gift, Dog Wall Art, Pet Bathtub (18 words, "Dog" ×4)</span><br>
+    <span class="correct">✓ Correct: Custom Funny Pet Portrait, Dog Bathroom Art</span></p>
+    <br>
+    <p><strong>EX 8 — Word salad:</strong><br>
+    Original: Handmade Ceramic Mug, Coffee Cup, Tea Mug, Pottery Mug, Stoneware Mug, Rustic Kitchen Gift<br>
+    <span class="wrong">✗ Wrong: Handmade Ceramic Coffee Tea Pottery Stoneware Rustic Mug (synonyms stacked)</span><br>
+    <span class="correct">✓ Correct: Handmade Stoneware Mug, Rustic Kitchen Pottery</span></p>
+  </div>
+</div>
+
+<!-- ═══════════════════ 7 — Final instruction ═══════════════════ -->
+<p class="section-heading">Final Instruction Paragraph</p>
+<div class="after-card">
+  <div class="card-label">NEW VERSION</div>
+  <div class="after-text">
+    <strong>Before outputting, count the words in your title.</strong> If the count exceeds 12, remove the least distinctive word and recount. <strong>If the new title is longer than the original seller title, stop and rewrite.</strong> A rewrite that is longer than the original has failed. When in doubt between two words, always drop the less specific one. Output only the final title — no explanations, no additional text.
+  </div>
+</div>
+
+</body>
+</html>
