@@ -22,269 +22,384 @@
   .ci { color: #888; font-size: 0.9em; }
   .n { color: #aaa; font-size: 0.85em; }
   .meta { color: #888; font-size: 0.85em; margin-top: 24px; }
-  .chart-container.annotated { border: 2px solid #3b82f6; }
-  .findings { background: #fff; border: 1px solid #e0e0e0; border-left: 4px solid #3b82f6;
-              border-radius: 6px; padding: 14px 18px; margin: 16px 0 24px; font-size: 14px;
-              line-height: 1.5; }
-  .findings h2 { margin-top: 0; }
-  .findings ul { margin: 8px 0 0; padding-left: 20px; }
-  .findings li { margin: 6px 0; }
-  .swatch { display: inline-block; width: 10px; height: 10px; border-radius: 2px;
-            margin: 0 4px 0 1px; }
 </style>
 </head>
 <body>
 <h1>Experiment Comparison</h1>
 
-<div class="findings">
-<h2>Key Findings</h2>
-<ul>
-<li><b>DPO leads on quality and keeps heuristics high:</b>
-<span class="swatch" style="background:#ff9da7"></span>dpo_np (88.6%) and
-<span class="swatch" style="background:#b07aa1"></span>dpo_op (87.8%) top <i>is_not_poor</i>
-among all finetuned models &mdash; well above SFT-only ft (76.1&ndash;80.2%) and gemini
-(83&ndash;84%) &mdash; while dpo_np also holds <i>passes_heuristic</i> at 98.1%.</li>
-<li><b>New prompt is comparable to the old one:</b>
-<span class="swatch" style="background:#f28e2b"></span>gemini_new tracks
-<span class="swatch" style="background:#4e79a7"></span>gemini_old across the board
-(<i>is_not_poor</i> 83.0% vs 84.3%, <i>passes_heuristic</i> 99.7% vs 99.9%,
-<i>is_grounded</i> 93.2% vs 93.6% &mdash; all within CI).</li>
-<li><b>Qwen is performant, but trails gemini on heuristics:</b>
-<span class="swatch" style="background:#e15759"></span>qwen_op posts the single best
-<i>is_not_poor</i> (89.8%), yet qwen's <i>passes_heuristic</i> (96.4&ndash;96.7%) sits
-clearly below gemini's 99.7&ndash;99.9%.</li>
-</ul>
-</div>
 
+<div style="display:flex; gap:16px; flex-wrap:wrap; margin:24px 0;">
+
+  <div style="flex:1 1 280px; background:#e3f2fd; border-left:5px solid #1976d2;
+              border-radius:6px; padding:16px;">
+    <div style="font-weight:700; color:#1565c0; margin-bottom:6px;">
+      🔵 Qwen ≈ Gemini performance
+    </div>
+    <div style="font-size:0.9em; color:#333;">
+      Qwen (op &amp; np) tracks Gemini closely across all metrics — the only notable gap
+      is a slightly lower heuristic score.
+    </div>
+  </div>
+
+  <div style="flex:1 1 280px; background:#fff3e0; border-left:5px solid #e65100;
+              border-radius:6px; padding:16px;">
+    <div style="font-weight:700; color:#bf360c; margin-bottom:6px;">
+      🟠 DPO heuristics: trade-off alert
+    </div>
+    <div style="font-size:0.9em; color:#333;">
+      DPO heuristics models boost readability, heuristic, and richness scores but at the cost
+      of <strong>drastically reduced groundedness</strong>.
+      Using Qwen as a base (<em>dpo_heuristics_base_qwen</em>) yields the worst groundedness of all.
+    </div>
+  </div>
+
+  <div style="flex:1 1 280px; background:#e8f5e9; border-left:5px solid #2e7d32;
+              border-radius:6px; padding:16px;">
+    <div style="font-weight:700; color:#1b5e20; margin-bottom:6px;">
+      🟢 dpo_np &amp; no_cot_fixed — most balanced models
+    </div>
+    <div style="font-size:0.9em; color:#333;">
+      <strong>dpo_np</strong> and <strong>no_cot_fixed</strong> both achieve sufficiently high scores
+      across <em>all</em> evaluators without any single metric collapsing — the best overall trade-off.
+    </div>
+  </div>
+
+</div>
 <div class="charts-grid">
-<div class="chart-container"><h2>is_grounded</h2><svg xmlns="http://www.w3.org/2000/svg" width="750" height="284" style="font-family: inherit;">
+<div class="chart-container"><h2>is_grounded</h2><svg xmlns="http://www.w3.org/2000/svg" width="750" height="504" style="font-family: inherit;"><defs>
+  <marker id="arr-red" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#b71c1c"/></marker>
+  <marker id="arr-blue" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#0d47a1"/></marker>
+  <marker id="arr-green" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#1b5e20"/></marker>
+  <marker id="arr-orange" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#bf360c"/></marker>
+</defs><rect x="0" y="282" width="750" height="28" fill="#1b5e20" opacity="0.15"/><rect x="0" y="310" width="750" height="28" fill="#b71c1c" opacity="0.15"/><rect x="0" y="338" width="750" height="28" fill="#b71c1c" opacity="0.22"/>
 <text x="8" y="18" font-size="11" font-weight="600" fill="#555">Experiment</text>
 <text x="410.0" y="18" text-anchor="middle" font-size="11" font-weight="600" fill="#555">Rate (95% Wilson CI)</text>
 <text x="612" y="18" font-size="11" font-weight="600" fill="#555">Value [CI]</text>
-<line x1="220.0" y1="30" x2="220.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="220.0" y="268" text-anchor="middle" font-size="10" fill="#888">85%</text>
-<line x1="296.0" y1="30" x2="296.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="296.0" y="268" text-anchor="middle" font-size="10" fill="#888">88%</text>
-<line x1="372.0" y1="30" x2="372.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="372.0" y="268" text-anchor="middle" font-size="10" fill="#888">91%</text>
-<line x1="448.0" y1="30" x2="448.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="448.0" y="268" text-anchor="middle" font-size="10" fill="#888">94%</text>
-<line x1="524.0" y1="30" x2="524.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="524.0" y="268" text-anchor="middle" font-size="10" fill="#888">97%</text>
-<line x1="600.0" y1="30" x2="600.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="600.0" y="268" text-anchor="middle" font-size="10" fill="#888">100%</text>
+<line x1="220.0" y1="30" x2="220.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="220.0" y="408" text-anchor="middle" font-size="10" fill="#888">54%</text>
+<line x1="296.0" y1="30" x2="296.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="296.0" y="408" text-anchor="middle" font-size="10" fill="#888">63%</text>
+<line x1="372.0" y1="30" x2="372.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="372.0" y="408" text-anchor="middle" font-size="10" fill="#888">72%</text>
+<line x1="448.0" y1="30" x2="448.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="448.0" y="408" text-anchor="middle" font-size="10" fill="#888">82%</text>
+<line x1="524.0" y1="30" x2="524.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="524.0" y="408" text-anchor="middle" font-size="10" fill="#888">91%</text>
+<line x1="600.0" y1="30" x2="600.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="600.0" y="408" text-anchor="middle" font-size="10" fill="#888">100%</text>
 <rect x="0" y="30.0" width="750" height="28" fill="#f8f8f8"/>
 <text x="8" y="44.0" dominant-baseline="central" font-size="11" fill="#333">gemini_old-6de1f762</text>
-<line x1="392.5" y1="44.0" x2="474.7" y2="44.0" stroke="#4e79a7" stroke-width="2"/>
-<line x1="392.5" y1="41.0" x2="392.5" y2="47.0" stroke="#4e79a7" stroke-width="2"/>
-<line x1="474.7" y1="41.0" x2="474.7" y2="47.0" stroke="#4e79a7" stroke-width="2"/>
-<rect x="434.4" y="40.0" width="8" height="8" fill="#4e79a7" stroke="#fff" stroke-width="1"/>
+<line x1="532.3" y1="44.0" x2="559.2" y2="44.0" stroke="#4e79a7" stroke-width="2"/>
+<line x1="532.3" y1="41.0" x2="532.3" y2="47.0" stroke="#4e79a7" stroke-width="2"/>
+<line x1="559.2" y1="41.0" x2="559.2" y2="47.0" stroke="#4e79a7" stroke-width="2"/>
+<rect x="543.3" y="40.0" width="8" height="8" fill="#4e79a7" stroke="#fff" stroke-width="1"/>
 <text x="612" y="44.0" dominant-baseline="central" font-size="11" fill="#333">93.6% [91.8%, 95.1%]</text>
 <text x="8" y="72.0" dominant-baseline="central" font-size="11" fill="#333">gemini_new-cd212caa</text>
-<line x1="380.6" y1="72.0" x2="465.7" y2="72.0" stroke="#f28e2b" stroke-width="2"/>
-<line x1="380.6" y1="69.0" x2="380.6" y2="75.0" stroke="#f28e2b" stroke-width="2"/>
-<line x1="465.7" y1="69.0" x2="465.7" y2="75.0" stroke="#f28e2b" stroke-width="2"/>
-<rect x="424.0" y="68.0" width="8" height="8" fill="#f28e2b" stroke="#fff" stroke-width="1"/>
+<line x1="528.5" y1="72.0" x2="556.2" y2="72.0" stroke="#f28e2b" stroke-width="2"/>
+<line x1="528.5" y1="69.0" x2="528.5" y2="75.0" stroke="#f28e2b" stroke-width="2"/>
+<line x1="556.2" y1="69.0" x2="556.2" y2="75.0" stroke="#f28e2b" stroke-width="2"/>
+<rect x="539.9" y="68.0" width="8" height="8" fill="#f28e2b" stroke="#fff" stroke-width="1"/>
 <text x="612" y="72.0" dominant-baseline="central" font-size="11" fill="#333">93.2% [91.3%, 94.7%]</text>
 <rect x="0" y="86.0" width="750" height="28" fill="#f8f8f8"/>
 <text x="8" y="100.0" dominant-baseline="central" font-size="11" fill="#333">qwen_op-f764de6e</text>
-<line x1="301.0" y1="100.0" x2="400.2" y2="100.0" stroke="#e15759" stroke-width="2"/>
-<line x1="301.0" y1="97.0" x2="301.0" y2="103.0" stroke="#e15759" stroke-width="2"/>
-<line x1="400.2" y1="97.0" x2="400.2" y2="103.0" stroke="#e15759" stroke-width="2"/>
-<rect x="351.0" y="96.0" width="8" height="8" fill="#e15759" stroke="#fff" stroke-width="1"/>
+<line x1="502.5" y1="100.0" x2="534.8" y2="100.0" stroke="#e15759" stroke-width="2"/>
+<line x1="502.5" y1="97.0" x2="502.5" y2="103.0" stroke="#e15759" stroke-width="2"/>
+<line x1="534.8" y1="97.0" x2="534.8" y2="103.0" stroke="#e15759" stroke-width="2"/>
+<rect x="516.1" y="96.0" width="8" height="8" fill="#e15759" stroke="#fff" stroke-width="1"/>
 <text x="612" y="100.0" dominant-baseline="central" font-size="11" fill="#333">90.3% [88.2%, 92.1%]</text>
 <text x="8" y="128.0" dominant-baseline="central" font-size="11" fill="#333">qwen_np-bd957935</text>
-<line x1="431.1" y1="128.0" x2="504.8" y2="128.0" stroke="#76b7b2" stroke-width="2"/>
-<line x1="431.1" y1="125.0" x2="431.1" y2="131.0" stroke="#76b7b2" stroke-width="2"/>
-<line x1="504.8" y1="125.0" x2="504.8" y2="131.0" stroke="#76b7b2" stroke-width="2"/>
-<rect x="468.9" y="124.0" width="8" height="8" fill="#76b7b2" stroke="#fff" stroke-width="1"/>
+<line x1="544.9" y1="128.0" x2="569.0" y2="128.0" stroke="#76b7b2" stroke-width="2"/>
+<line x1="544.9" y1="125.0" x2="544.9" y2="131.0" stroke="#76b7b2" stroke-width="2"/>
+<line x1="569.0" y1="125.0" x2="569.0" y2="131.0" stroke="#76b7b2" stroke-width="2"/>
+<rect x="554.6" y="124.0" width="8" height="8" fill="#76b7b2" stroke="#fff" stroke-width="1"/>
 <text x="612" y="128.0" dominant-baseline="central" font-size="11" fill="#333">95.0% [93.3%, 96.2%]</text>
 <rect x="0" y="142.0" width="750" height="28" fill="#f8f8f8"/>
 <text x="8" y="156.0" dominant-baseline="central" font-size="11" fill="#333">ft_op-3148189a</text>
-<line x1="424.4" y1="156.0" x2="499.7" y2="156.0" stroke="#59a14f" stroke-width="2"/>
-<line x1="424.4" y1="153.0" x2="424.4" y2="159.0" stroke="#59a14f" stroke-width="2"/>
-<line x1="499.7" y1="153.0" x2="499.7" y2="159.0" stroke="#59a14f" stroke-width="2"/>
-<rect x="463.0" y="152.0" width="8" height="8" fill="#59a14f" stroke="#fff" stroke-width="1"/>
+<line x1="542.7" y1="156.0" x2="567.3" y2="156.0" stroke="#59a14f" stroke-width="2"/>
+<line x1="542.7" y1="153.0" x2="542.7" y2="159.0" stroke="#59a14f" stroke-width="2"/>
+<line x1="567.3" y1="153.0" x2="567.3" y2="159.0" stroke="#59a14f" stroke-width="2"/>
+<rect x="552.6" y="152.0" width="8" height="8" fill="#59a14f" stroke="#fff" stroke-width="1"/>
 <text x="612" y="156.0" dominant-baseline="central" font-size="11" fill="#333">94.7% [93.1%, 96.0%]</text>
 <text x="8" y="184.0" dominant-baseline="central" font-size="11" fill="#333">ft_np-b253e761</text>
-<line x1="454.1" y1="184.0" x2="522.1" y2="184.0" stroke="#edc948" stroke-width="2"/>
-<line x1="454.1" y1="181.0" x2="454.1" y2="187.0" stroke="#edc948" stroke-width="2"/>
-<line x1="522.1" y1="181.0" x2="522.1" y2="187.0" stroke="#edc948" stroke-width="2"/>
-<rect x="489.1" y="180.0" width="8" height="8" fill="#edc948" stroke="#fff" stroke-width="1"/>
+<line x1="552.4" y1="184.0" x2="574.6" y2="184.0" stroke="#edc948" stroke-width="2"/>
+<line x1="552.4" y1="181.0" x2="552.4" y2="187.0" stroke="#edc948" stroke-width="2"/>
+<line x1="574.6" y1="181.0" x2="574.6" y2="187.0" stroke="#edc948" stroke-width="2"/>
+<rect x="561.1" y="180.0" width="8" height="8" fill="#edc948" stroke="#fff" stroke-width="1"/>
 <text x="612" y="184.0" dominant-baseline="central" font-size="11" fill="#333">95.8% [94.2%, 96.9%]</text>
 <rect x="0" y="198.0" width="750" height="28" fill="#f8f8f8"/>
-<text x="8" y="212.0" dominant-baseline="central" font-size="11" fill="#333">dpo_op-6838db16</text>
-<line x1="382.1" y1="212.0" x2="466.7" y2="212.0" stroke="#b07aa1" stroke-width="2"/>
-<line x1="382.1" y1="209.0" x2="382.1" y2="215.0" stroke="#b07aa1" stroke-width="2"/>
-<line x1="466.7" y1="209.0" x2="466.7" y2="215.0" stroke="#b07aa1" stroke-width="2"/>
-<rect x="425.2" y="208.0" width="8" height="8" fill="#b07aa1" stroke="#fff" stroke-width="1"/>
-<text x="612" y="212.0" dominant-baseline="central" font-size="11" fill="#333">93.3% [91.4%, 94.7%]</text>
-<text x="8" y="240.0" dominant-baseline="central" font-size="11" fill="#333">dpo_np-f8e62689</text>
-<line x1="401.7" y1="240.0" x2="482.1" y2="240.0" stroke="#ff9da7" stroke-width="2"/>
-<line x1="401.7" y1="237.0" x2="401.7" y2="243.0" stroke="#ff9da7" stroke-width="2"/>
-<line x1="482.1" y1="237.0" x2="482.1" y2="243.0" stroke="#ff9da7" stroke-width="2"/>
-<rect x="442.7" y="236.0" width="8" height="8" fill="#ff9da7" stroke="#fff" stroke-width="1"/>
-<text x="612" y="240.0" dominant-baseline="central" font-size="11" fill="#333">93.9% [92.2%, 95.3%]</text>
-</svg></div><div class="chart-container annotated"><h2>is_not_poor</h2><svg xmlns="http://www.w3.org/2000/svg" width="750" height="324" style="font-family: inherit;">
+<text x="8" y="212.0" dominant-baseline="central" font-size="11" fill="#333">cot_fixed-56b46d63</text>
+<line x1="556.1" y1="212.0" x2="577.4" y2="212.0" stroke="#b07aa1" stroke-width="2"/>
+<line x1="556.1" y1="209.0" x2="556.1" y2="215.0" stroke="#b07aa1" stroke-width="2"/>
+<line x1="577.4" y1="209.0" x2="577.4" y2="215.0" stroke="#b07aa1" stroke-width="2"/>
+<rect x="564.4" y="208.0" width="8" height="8" fill="#b07aa1" stroke="#fff" stroke-width="1"/>
+<text x="612" y="212.0" dominant-baseline="central" font-size="11" fill="#333">96.2% [94.7%, 97.3%]</text>
+<text x="8" y="240.0" dominant-baseline="central" font-size="11" fill="#333">no_cot_fixed-8fd329ca</text>
+<line x1="543.0" y1="240.0" x2="567.4" y2="240.0" stroke="#ff9da7" stroke-width="2"/>
+<line x1="543.0" y1="237.0" x2="543.0" y2="243.0" stroke="#ff9da7" stroke-width="2"/>
+<line x1="567.4" y1="237.0" x2="567.4" y2="243.0" stroke="#ff9da7" stroke-width="2"/>
+<rect x="552.8" y="236.0" width="8" height="8" fill="#ff9da7" stroke="#fff" stroke-width="1"/>
+<text x="612" y="240.0" dominant-baseline="central" font-size="11" fill="#333">94.8% [93.1%, 96.1%]</text>
+<rect x="0" y="254.0" width="750" height="28" fill="#f8f8f8"/>
+<text x="8" y="268.0" dominant-baseline="central" font-size="11" fill="#333">dpo_op-6838db16</text>
+<line x1="529.0" y1="268.0" x2="556.5" y2="268.0" stroke="#9c755f" stroke-width="2"/>
+<line x1="529.0" y1="265.0" x2="529.0" y2="271.0" stroke="#9c755f" stroke-width="2"/>
+<line x1="556.5" y1="265.0" x2="556.5" y2="271.0" stroke="#9c755f" stroke-width="2"/>
+<rect x="540.3" y="264.0" width="8" height="8" fill="#9c755f" stroke="#fff" stroke-width="1"/>
+<text x="612" y="268.0" dominant-baseline="central" font-size="11" fill="#333">93.3% [91.4%, 94.7%]</text>
+<text x="8" y="296.0" dominant-baseline="central" font-size="11" fill="#333">dpo_np-f8e62689</text>
+<line x1="535.3" y1="296.0" x2="561.5" y2="296.0" stroke="#bab0ac" stroke-width="2"/>
+<line x1="535.3" y1="293.0" x2="535.3" y2="299.0" stroke="#bab0ac" stroke-width="2"/>
+<line x1="561.5" y1="293.0" x2="561.5" y2="299.0" stroke="#bab0ac" stroke-width="2"/>
+<rect x="546.0" y="292.0" width="8" height="8" fill="#bab0ac" stroke="#fff" stroke-width="1"/>
+<text x="612" y="296.0" dominant-baseline="central" font-size="11" fill="#333">93.9% [92.2%, 95.3%]</text>
+<rect x="0" y="310.0" width="750" height="28" fill="#f8f8f8"/>
+<text x="8" y="324.0" dominant-baseline="central" font-size="11" fill="#333">dpo_heueristics_base_ft-5f77bb3b</text>
+<line x1="400.9" y1="324.0" x2="445.5" y2="324.0" stroke="#4e79a7" stroke-width="2"/>
+<line x1="400.9" y1="321.0" x2="400.9" y2="327.0" stroke="#4e79a7" stroke-width="2"/>
+<line x1="445.5" y1="321.0" x2="445.5" y2="327.0" stroke="#4e79a7" stroke-width="2"/>
+<rect x="420.3" y="320.0" width="8" height="8" fill="#4e79a7" stroke="#fff" stroke-width="1"/>
+<text x="612" y="324.0" dominant-baseline="central" font-size="11" fill="#333">78.7% [75.9%, 81.3%]</text>
+<text x="8" y="352.0" dominant-baseline="central" font-size="11" fill="#333">dpo_heuristics_base_qwen-27612bdc</text>
+<line x1="308.3" y1="352.0" x2="359.1" y2="352.0" stroke="#f28e2b" stroke-width="2"/>
+<line x1="308.3" y1="349.0" x2="308.3" y2="355.0" stroke="#f28e2b" stroke-width="2"/>
+<line x1="359.1" y1="349.0" x2="359.1" y2="355.0" stroke="#f28e2b" stroke-width="2"/>
+<rect x="330.3" y="348.0" width="8" height="8" fill="#f28e2b" stroke="#fff" stroke-width="1"/>
+<text x="612" y="352.0" dominant-baseline="central" font-size="11" fill="#333">67.8% [64.7%, 70.8%]</text>
+<rect x="0" y="366.0" width="750" height="28" fill="#f8f8f8"/>
+<text x="8" y="380.0" dominant-baseline="central" font-size="11" fill="#333">dpo_balanced_base_ft-49defe76</text>
+<line x1="475.2" y1="380.0" x2="511.6" y2="380.0" stroke="#e15759" stroke-width="2"/>
+<line x1="475.2" y1="377.0" x2="475.2" y2="383.0" stroke="#e15759" stroke-width="2"/>
+<line x1="511.6" y1="377.0" x2="511.6" y2="383.0" stroke="#e15759" stroke-width="2"/>
+<rect x="490.7" y="376.0" width="8" height="8" fill="#e15759" stroke="#fff" stroke-width="1"/>
+<text x="612" y="380.0" dominant-baseline="central" font-size="11" fill="#333">87.3% [84.9%, 89.3%]</text>
+<line x1="208" y1="310" x2="208" y2="366" stroke="#b71c1c" stroke-width="2"/><line x1="208" y1="310" x2="216" y2="310" stroke="#b71c1c" stroke-width="2"/><line x1="208" y1="366" x2="216" y2="366" stroke="#b71c1c" stroke-width="2"/><rect x="220" y="436" width="220" height="24" rx="4" fill="#b71c1c" opacity="0.92"/><text x="330" y="452" text-anchor="middle" font-size="9" font-weight="600" fill="white">⚠ Groundedness collapses here</text><line x1="330" y1="436" x2="330" y2="328" stroke="#b71c1c" stroke-width="1.8" stroke-dasharray="4,2" marker-end="url(#arr-red)"/><rect x="222" y="343" width="116" height="14" rx="3" fill="#7b1fa2" opacity="0.9"/><text x="226" y="354" font-size="9" font-weight="600" fill="white">worst groundedness</text><rect x="460" y="436" width="170" height="24" rx="4" fill="#2e7d32" opacity="0.92"/><text x="545" y="452" text-anchor="middle" font-size="9" font-weight="600" fill="white">✓ dpo_np / no_cot: most balanced</text><line x1="545" y1="436" x2="545" y2="300" stroke="#2e7d32" stroke-width="1.8" stroke-dasharray="4,2" marker-end="url(#arr-green)"/><rect x="220" y="468" width="220" height="24" rx="4" fill="#6a1b9a" opacity="0.92"/><text x="330" y="484" text-anchor="middle" font-size="9" font-weight="600" fill="white">Qwen base = worst groundedness</text><line x1="330" y1="468" x2="330" y2="356" stroke="#7b1fa2" stroke-width="1.8" stroke-dasharray="4,2" marker-end="url(#arr-red)"/><rect x="0" y="226" width="750" height="28" fill="#1b5e20" opacity="0.15"/><rect x="222" y="231" width="68" height="14" rx="3" fill="#2e7d32" opacity="0.9"/><text x="226" y="242" font-size="9" font-weight="600" fill="white">✓ balanced</text></svg></div><div class="chart-container"><h2>is_not_poor</h2><svg xmlns="http://www.w3.org/2000/svg" width="750" height="504" style="font-family: inherit;"><defs>
+  <marker id="arr-red" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#b71c1c"/></marker>
+  <marker id="arr-blue" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#0d47a1"/></marker>
+  <marker id="arr-green" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#1b5e20"/></marker>
+  <marker id="arr-orange" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#bf360c"/></marker>
+</defs><rect x="0" y="282" width="750" height="28" fill="#1b5e20" opacity="0.15"/><rect x="0" y="310" width="750" height="28" fill="#e65100" opacity="0.12"/><rect x="0" y="338" width="750" height="28" fill="#e65100" opacity="0.12"/>
 <text x="8" y="18" font-size="11" font-weight="600" fill="#555">Experiment</text>
 <text x="410.0" y="18" text-anchor="middle" font-size="11" font-weight="600" fill="#555">Rate (95% Wilson CI)</text>
 <text x="612" y="18" font-size="11" font-weight="600" fill="#555">Value [CI]</text>
-<line x1="220.0" y1="30" x2="220.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="220.0" y="268" text-anchor="middle" font-size="10" fill="#888">67%</text>
-<line x1="296.0" y1="30" x2="296.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="296.0" y="268" text-anchor="middle" font-size="10" fill="#888">73%</text>
-<line x1="372.0" y1="30" x2="372.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="372.0" y="268" text-anchor="middle" font-size="10" fill="#888">79%</text>
-<line x1="448.0" y1="30" x2="448.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="448.0" y="268" text-anchor="middle" font-size="10" fill="#888">86%</text>
-<line x1="524.0" y1="30" x2="524.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="524.0" y="268" text-anchor="middle" font-size="10" fill="#888">92%</text>
-<line x1="600.0" y1="30" x2="600.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="600.0" y="268" text-anchor="middle" font-size="10" fill="#888">98%</text>
+<line x1="220.0" y1="30" x2="220.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="220.0" y="408" text-anchor="middle" font-size="10" fill="#888">65%</text>
+<line x1="296.0" y1="30" x2="296.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="296.0" y="408" text-anchor="middle" font-size="10" fill="#888">72%</text>
+<line x1="372.0" y1="30" x2="372.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="372.0" y="408" text-anchor="middle" font-size="10" fill="#888">79%</text>
+<line x1="448.0" y1="30" x2="448.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="448.0" y="408" text-anchor="middle" font-size="10" fill="#888">86%</text>
+<line x1="524.0" y1="30" x2="524.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="524.0" y="408" text-anchor="middle" font-size="10" fill="#888">93%</text>
+<line x1="600.0" y1="30" x2="600.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="600.0" y="408" text-anchor="middle" font-size="10" fill="#888">100%</text>
 <rect x="0" y="30.0" width="750" height="28" fill="#f8f8f8"/>
 <text x="8" y="44.0" dominant-baseline="central" font-size="11" fill="#333">gemini_old-6de1f762</text>
-<line x1="400.8" y1="44.0" x2="459.7" y2="44.0" stroke="#4e79a7" stroke-width="2"/>
-<line x1="400.8" y1="41.0" x2="400.8" y2="47.0" stroke="#4e79a7" stroke-width="2"/>
-<line x1="459.7" y1="41.0" x2="459.7" y2="47.0" stroke="#4e79a7" stroke-width="2"/>
-<rect x="428.1" y="40.0" width="8" height="8" fill="#4e79a7" stroke="#fff" stroke-width="1"/>
+<line x1="401.8" y1="44.0" x2="454.0" y2="44.0" stroke="#4e79a7" stroke-width="2"/>
+<line x1="401.8" y1="41.0" x2="401.8" y2="47.0" stroke="#4e79a7" stroke-width="2"/>
+<line x1="454.0" y1="41.0" x2="454.0" y2="47.0" stroke="#4e79a7" stroke-width="2"/>
+<rect x="425.5" y="40.0" width="8" height="8" fill="#4e79a7" stroke="#fff" stroke-width="1"/>
 <text x="612" y="44.0" dominant-baseline="central" font-size="11" fill="#333">84.3% [81.7%, 86.6%]</text>
 <text x="8" y="72.0" dominant-baseline="central" font-size="11" fill="#333">gemini_new-cd212caa</text>
-<line x1="383.6" y1="72.0" x2="444.8" y2="72.0" stroke="#f28e2b" stroke-width="2"/>
-<line x1="383.6" y1="69.0" x2="383.6" y2="75.0" stroke="#f28e2b" stroke-width="2"/>
-<line x1="444.8" y1="69.0" x2="444.8" y2="75.0" stroke="#f28e2b" stroke-width="2"/>
-<rect x="412.0" y="68.0" width="8" height="8" fill="#f28e2b" stroke="#fff" stroke-width="1"/>
+<line x1="386.6" y1="72.0" x2="440.8" y2="72.0" stroke="#f28e2b" stroke-width="2"/>
+<line x1="386.6" y1="69.0" x2="386.6" y2="75.0" stroke="#f28e2b" stroke-width="2"/>
+<line x1="440.8" y1="69.0" x2="440.8" y2="75.0" stroke="#f28e2b" stroke-width="2"/>
+<rect x="411.3" y="68.0" width="8" height="8" fill="#f28e2b" stroke="#fff" stroke-width="1"/>
 <text x="612" y="72.0" dominant-baseline="central" font-size="11" fill="#333">83.0% [80.3%, 85.3%]</text>
 <rect x="0" y="86.0" width="750" height="28" fill="#f8f8f8"/>
 <text x="8" y="100.0" dominant-baseline="central" font-size="11" fill="#333">qwen_op-f764de6e</text>
-<line x1="472.6" y1="100.0" x2="521.7" y2="100.0" stroke="#e15759" stroke-width="2"/>
-<line x1="472.6" y1="97.0" x2="472.6" y2="103.0" stroke="#e15759" stroke-width="2"/>
-<line x1="521.7" y1="97.0" x2="521.7" y2="103.0" stroke="#e15759" stroke-width="2"/>
-<rect x="495.3" y="96.0" width="8" height="8" fill="#e15759" stroke="#fff" stroke-width="1"/>
+<line x1="465.5" y1="100.0" x2="509.0" y2="100.0" stroke="#e15759" stroke-width="2"/>
+<line x1="465.5" y1="97.0" x2="465.5" y2="103.0" stroke="#e15759" stroke-width="2"/>
+<line x1="509.0" y1="97.0" x2="509.0" y2="103.0" stroke="#e15759" stroke-width="2"/>
+<rect x="485.1" y="96.0" width="8" height="8" fill="#e15759" stroke="#fff" stroke-width="1"/>
 <text x="612" y="100.0" dominant-baseline="central" font-size="11" fill="#333">89.8% [87.6%, 91.6%]</text>
 <text x="8" y="128.0" dominant-baseline="central" font-size="11" fill="#333">qwen_np-bd957935</text>
-<line x1="382.2" y1="128.0" x2="443.2" y2="128.0" stroke="#76b7b2" stroke-width="2"/>
-<line x1="382.2" y1="125.0" x2="382.2" y2="131.0" stroke="#76b7b2" stroke-width="2"/>
-<line x1="443.2" y1="125.0" x2="443.2" y2="131.0" stroke="#76b7b2" stroke-width="2"/>
-<rect x="410.4" y="124.0" width="8" height="8" fill="#76b7b2" stroke="#fff" stroke-width="1"/>
+<line x1="385.4" y1="128.0" x2="439.4" y2="128.0" stroke="#76b7b2" stroke-width="2"/>
+<line x1="385.4" y1="125.0" x2="385.4" y2="131.0" stroke="#76b7b2" stroke-width="2"/>
+<line x1="439.4" y1="125.0" x2="439.4" y2="131.0" stroke="#76b7b2" stroke-width="2"/>
+<rect x="409.9" y="124.0" width="8" height="8" fill="#76b7b2" stroke="#fff" stroke-width="1"/>
 <text x="612" y="128.0" dominant-baseline="central" font-size="11" fill="#333">82.9% [80.2%, 85.2%]</text>
 <rect x="0" y="142.0" width="750" height="28" fill="#f8f8f8"/>
 <text x="8" y="156.0" dominant-baseline="central" font-size="11" fill="#333">ft_op-3148189a</text>
-<line x1="347.4" y1="156.0" x2="412.0" y2="156.0" stroke="#59a14f" stroke-width="2"/>
-<line x1="347.4" y1="153.0" x2="347.4" y2="159.0" stroke="#59a14f" stroke-width="2"/>
-<line x1="412.0" y1="153.0" x2="412.0" y2="159.0" stroke="#59a14f" stroke-width="2"/>
-<rect x="377.3" y="152.0" width="8" height="8" fill="#59a14f" stroke="#fff" stroke-width="1"/>
+<line x1="354.5" y1="156.0" x2="411.8" y2="156.0" stroke="#59a14f" stroke-width="2"/>
+<line x1="354.5" y1="153.0" x2="354.5" y2="159.0" stroke="#59a14f" stroke-width="2"/>
+<line x1="411.8" y1="153.0" x2="411.8" y2="159.0" stroke="#59a14f" stroke-width="2"/>
+<rect x="380.6" y="152.0" width="8" height="8" fill="#59a14f" stroke="#fff" stroke-width="1"/>
 <text x="612" y="156.0" dominant-baseline="central" font-size="11" fill="#333">80.2% [77.4%, 82.7%]</text>
 <text x="8" y="184.0" dominant-baseline="central" font-size="11" fill="#333">ft_np-b253e761</text>
-<line x1="295.0" y1="184.0" x2="364.2" y2="184.0" stroke="#edc948" stroke-width="2"/>
-<line x1="295.0" y1="181.0" x2="295.0" y2="187.0" stroke="#edc948" stroke-width="2"/>
-<line x1="364.2" y1="181.0" x2="364.2" y2="187.0" stroke="#edc948" stroke-width="2"/>
-<rect x="327.0" y="180.0" width="8" height="8" fill="#edc948" stroke="#fff" stroke-width="1"/>
+<line x1="308.2" y1="184.0" x2="369.4" y2="184.0" stroke="#edc948" stroke-width="2"/>
+<line x1="308.2" y1="181.0" x2="308.2" y2="187.0" stroke="#edc948" stroke-width="2"/>
+<line x1="369.4" y1="181.0" x2="369.4" y2="187.0" stroke="#edc948" stroke-width="2"/>
+<rect x="336.0" y="180.0" width="8" height="8" fill="#edc948" stroke="#fff" stroke-width="1"/>
 <text x="612" y="184.0" dominant-baseline="central" font-size="11" fill="#333">76.1% [73.1%, 78.8%]</text>
 <rect x="0" y="198.0" width="750" height="28" fill="#f8f8f8"/>
-<text x="8" y="212.0" dominant-baseline="central" font-size="11" fill="#333">dpo_op-6838db16</text>
-<line x1="446.2" y1="212.0" x2="499.4" y2="212.0" stroke="#b07aa1" stroke-width="2"/>
-<line x1="446.2" y1="209.0" x2="446.2" y2="215.0" stroke="#b07aa1" stroke-width="2"/>
-<line x1="499.4" y1="209.0" x2="499.4" y2="215.0" stroke="#b07aa1" stroke-width="2"/>
-<rect x="470.8" y="208.0" width="8" height="8" fill="#b07aa1" stroke="#fff" stroke-width="1"/>
-<text x="612" y="212.0" dominant-baseline="central" font-size="11" fill="#333">87.8% [85.5%, 89.8%]</text>
-<text x="8" y="240.0" dominant-baseline="central" font-size="11" fill="#333">dpo_np-f8e62689</text>
-<line x1="457.1" y1="240.0" x2="508.6" y2="240.0" stroke="#ff9da7" stroke-width="2"/>
-<line x1="457.1" y1="237.0" x2="457.1" y2="243.0" stroke="#ff9da7" stroke-width="2"/>
-<line x1="508.6" y1="237.0" x2="508.6" y2="243.0" stroke="#ff9da7" stroke-width="2"/>
-<rect x="480.9" y="236.0" width="8" height="8" fill="#ff9da7" stroke="#fff" stroke-width="1"/>
-<text x="612" y="240.0" dominant-baseline="central" font-size="11" fill="#333">88.6% [86.3%, 90.5%]</text>
-
-<rect x="0" y="198" width="4" height="56" fill="#3b82f6"/>
-<line x1="546" y1="206" x2="546" y2="246" stroke="#3b82f6" stroke-width="2"/>
-<line x1="541" y1="206" x2="546" y2="206" stroke="#3b82f6" stroke-width="2"/>
-<line x1="541" y1="246" x2="546" y2="246" stroke="#3b82f6" stroke-width="2"/>
-<text x="552" y="226" dominant-baseline="central" font-size="10" font-weight="700" fill="#3b82f6">DPO &#9650;</text>
-<rect x="8" y="290" width="734" height="28" rx="4" fill="#eff6ff" stroke="#3b82f6"/>
-<text x="20" y="304" dominant-baseline="central" font-size="11" fill="#1e40af">&#9650; DPO leads: dpo_np 88.6% / dpo_op 87.8% &#8212; above gemini (83&#8211;84%) and SFT-only ft (76&#8211;80%); on par with qwen_op 89.8%</text>
-</svg></div><div class="chart-container"><h2>is_readable</h2><svg xmlns="http://www.w3.org/2000/svg" width="750" height="284" style="font-family: inherit;">
+<text x="8" y="212.0" dominant-baseline="central" font-size="11" fill="#333">cot_fixed-56b46d63</text>
+<line x1="362.0" y1="212.0" x2="418.8" y2="212.0" stroke="#b07aa1" stroke-width="2"/>
+<line x1="362.0" y1="209.0" x2="362.0" y2="215.0" stroke="#b07aa1" stroke-width="2"/>
+<line x1="418.8" y1="209.0" x2="418.8" y2="215.0" stroke="#b07aa1" stroke-width="2"/>
+<rect x="387.9" y="208.0" width="8" height="8" fill="#b07aa1" stroke="#fff" stroke-width="1"/>
+<text x="612" y="212.0" dominant-baseline="central" font-size="11" fill="#333">80.8% [78.1%, 83.3%]</text>
+<text x="8" y="240.0" dominant-baseline="central" font-size="11" fill="#333">no_cot_fixed-8fd329ca</text>
+<line x1="411.2" y1="240.0" x2="462.3" y2="240.0" stroke="#ff9da7" stroke-width="2"/>
+<line x1="411.2" y1="237.0" x2="411.2" y2="243.0" stroke="#ff9da7" stroke-width="2"/>
+<line x1="462.3" y1="237.0" x2="462.3" y2="243.0" stroke="#ff9da7" stroke-width="2"/>
+<rect x="434.4" y="236.0" width="8" height="8" fill="#ff9da7" stroke="#fff" stroke-width="1"/>
+<text x="612" y="240.0" dominant-baseline="central" font-size="11" fill="#333">85.1% [82.6%, 87.3%]</text>
+<rect x="0" y="254.0" width="750" height="28" fill="#f8f8f8"/>
+<text x="8" y="268.0" dominant-baseline="central" font-size="11" fill="#333">dpo_op-6838db16</text>
+<line x1="442.0" y1="268.0" x2="489.2" y2="268.0" stroke="#9c755f" stroke-width="2"/>
+<line x1="442.0" y1="265.0" x2="442.0" y2="271.0" stroke="#9c755f" stroke-width="2"/>
+<line x1="489.2" y1="265.0" x2="489.2" y2="271.0" stroke="#9c755f" stroke-width="2"/>
+<rect x="463.4" y="264.0" width="8" height="8" fill="#9c755f" stroke="#fff" stroke-width="1"/>
+<text x="612" y="268.0" dominant-baseline="central" font-size="11" fill="#333">87.8% [85.5%, 89.8%]</text>
+<text x="8" y="296.0" dominant-baseline="central" font-size="11" fill="#333">dpo_np-f8e62689</text>
+<line x1="451.7" y1="296.0" x2="497.4" y2="296.0" stroke="#bab0ac" stroke-width="2"/>
+<line x1="451.7" y1="293.0" x2="451.7" y2="299.0" stroke="#bab0ac" stroke-width="2"/>
+<line x1="497.4" y1="293.0" x2="497.4" y2="299.0" stroke="#bab0ac" stroke-width="2"/>
+<rect x="472.3" y="292.0" width="8" height="8" fill="#bab0ac" stroke="#fff" stroke-width="1"/>
+<text x="612" y="296.0" dominant-baseline="central" font-size="11" fill="#333">88.6% [86.3%, 90.5%]</text>
+<rect x="0" y="310.0" width="750" height="28" fill="#f8f8f8"/>
+<text x="8" y="324.0" dominant-baseline="central" font-size="11" fill="#333">dpo_heueristics_base_ft-5f77bb3b</text>
+<line x1="571.2" y1="324.0" x2="589.7" y2="324.0" stroke="#4e79a7" stroke-width="2"/>
+<line x1="571.2" y1="321.0" x2="571.2" y2="327.0" stroke="#4e79a7" stroke-width="2"/>
+<line x1="589.7" y1="321.0" x2="589.7" y2="327.0" stroke="#4e79a7" stroke-width="2"/>
+<rect x="578.7" y="320.0" width="8" height="8" fill="#4e79a7" stroke="#fff" stroke-width="1"/>
+<text x="612" y="324.0" dominant-baseline="central" font-size="11" fill="#333">98.4% [97.3%, 99.0%]</text>
+<text x="8" y="352.0" dominant-baseline="central" font-size="11" fill="#333">dpo_heuristics_base_qwen-27612bdc</text>
+<line x1="550.5" y1="352.0" x2="576.0" y2="352.0" stroke="#f28e2b" stroke-width="2"/>
+<line x1="550.5" y1="349.0" x2="550.5" y2="355.0" stroke="#f28e2b" stroke-width="2"/>
+<line x1="576.0" y1="349.0" x2="576.0" y2="355.0" stroke="#f28e2b" stroke-width="2"/>
+<rect x="561.5" y="348.0" width="8" height="8" fill="#f28e2b" stroke="#fff" stroke-width="1"/>
+<text x="612" y="352.0" dominant-baseline="central" font-size="11" fill="#333">96.8% [95.4%, 97.8%]</text>
+<rect x="0" y="366.0" width="750" height="28" fill="#f8f8f8"/>
+<text x="8" y="380.0" dominant-baseline="central" font-size="11" fill="#333">dpo_balanced_base_ft-49defe76</text>
+<line x1="530.6" y1="380.0" x2="561.5" y2="380.0" stroke="#e15759" stroke-width="2"/>
+<line x1="530.6" y1="377.0" x2="530.6" y2="383.0" stroke="#e15759" stroke-width="2"/>
+<line x1="561.5" y1="377.0" x2="561.5" y2="383.0" stroke="#e15759" stroke-width="2"/>
+<rect x="544.2" y="376.0" width="8" height="8" fill="#e15759" stroke="#fff" stroke-width="1"/>
+<text x="612" y="380.0" dominant-baseline="central" font-size="11" fill="#333">95.2% [93.6%, 96.4%]</text>
+<line x1="208" y1="310" x2="208" y2="366" stroke="#e65100" stroke-width="2"/><line x1="208" y1="310" x2="216" y2="310" stroke="#e65100" stroke-width="2"/><line x1="208" y1="366" x2="216" y2="366" stroke="#e65100" stroke-width="2"/><rect x="220" y="436" width="230" height="24" rx="4" fill="#e65100" opacity="0.92"/><text x="335" y="452" text-anchor="middle" font-size="9" font-weight="600" fill="white">↑ DPO heuristics boosts richness</text><line x1="335" y1="436" x2="335" y2="328" stroke="#e65100" stroke-width="1.8" stroke-dasharray="4,2" marker-end="url(#arr-orange)"/><rect x="460" y="436" width="170" height="24" rx="4" fill="#2e7d32" opacity="0.92"/><text x="545" y="452" text-anchor="middle" font-size="9" font-weight="600" fill="white">✓ dpo_np / no_cot: most balanced</text><rect x="222" y="287" width="68" height="14" rx="3" fill="#2e7d32" opacity="0.9"/><text x="226" y="298" font-size="9" font-weight="600" fill="white">✓ balanced</text><rect x="0" y="226" width="750" height="28" fill="#1b5e20" opacity="0.15"/><rect x="222" y="231" width="68" height="14" rx="3" fill="#2e7d32" opacity="0.9"/><text x="226" y="242" font-size="9" font-weight="600" fill="white">✓ balanced</text></svg></div><div class="chart-container"><h2>is_readable</h2><svg xmlns="http://www.w3.org/2000/svg" width="750" height="504" style="font-family: inherit;"><defs>
+  <marker id="arr-red" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#b71c1c"/></marker>
+  <marker id="arr-blue" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#0d47a1"/></marker>
+  <marker id="arr-green" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#1b5e20"/></marker>
+  <marker id="arr-orange" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#bf360c"/></marker>
+</defs><rect x="0" y="282" width="750" height="28" fill="#1b5e20" opacity="0.15"/><rect x="0" y="310" width="750" height="28" fill="#e65100" opacity="0.12"/><rect x="0" y="338" width="750" height="28" fill="#e65100" opacity="0.12"/>
 <text x="8" y="18" font-size="11" font-weight="600" fill="#555">Experiment</text>
 <text x="410.0" y="18" text-anchor="middle" font-size="11" font-weight="600" fill="#555">Rate (95% Wilson CI)</text>
 <text x="612" y="18" font-size="11" font-weight="600" fill="#555">Value [CI]</text>
-<line x1="220.0" y1="30" x2="220.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="220.0" y="268" text-anchor="middle" font-size="10" fill="#888">92%</text>
-<line x1="296.0" y1="30" x2="296.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="296.0" y="268" text-anchor="middle" font-size="10" fill="#888">94%</text>
-<line x1="372.0" y1="30" x2="372.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="372.0" y="268" text-anchor="middle" font-size="10" fill="#888">95%</text>
-<line x1="448.0" y1="30" x2="448.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="448.0" y="268" text-anchor="middle" font-size="10" fill="#888">97%</text>
-<line x1="524.0" y1="30" x2="524.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="524.0" y="268" text-anchor="middle" font-size="10" fill="#888">98%</text>
-<line x1="600.0" y1="30" x2="600.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="600.0" y="268" text-anchor="middle" font-size="10" fill="#888">100%</text>
+<line x1="220.0" y1="30" x2="220.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="220.0" y="408" text-anchor="middle" font-size="10" fill="#888">90%</text>
+<line x1="296.0" y1="30" x2="296.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="296.0" y="408" text-anchor="middle" font-size="10" fill="#888">92%</text>
+<line x1="372.0" y1="30" x2="372.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="372.0" y="408" text-anchor="middle" font-size="10" fill="#888">94%</text>
+<line x1="448.0" y1="30" x2="448.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="448.0" y="408" text-anchor="middle" font-size="10" fill="#888">96%</text>
+<line x1="524.0" y1="30" x2="524.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="524.0" y="408" text-anchor="middle" font-size="10" fill="#888">98%</text>
+<line x1="600.0" y1="30" x2="600.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="600.0" y="408" text-anchor="middle" font-size="10" fill="#888">100%</text>
 <rect x="0" y="30.0" width="750" height="28" fill="#f8f8f8"/>
 <text x="8" y="44.0" dominant-baseline="central" font-size="11" fill="#333">gemini_old-6de1f762</text>
-<line x1="415.0" y1="44.0" x2="516.9" y2="44.0" stroke="#4e79a7" stroke-width="2"/>
-<line x1="415.0" y1="41.0" x2="415.0" y2="47.0" stroke="#4e79a7" stroke-width="2"/>
-<line x1="516.9" y1="41.0" x2="516.9" y2="47.0" stroke="#4e79a7" stroke-width="2"/>
-<rect x="471.7" y="40.0" width="8" height="8" fill="#4e79a7" stroke="#fff" stroke-width="1"/>
+<line x1="452.0" y1="44.0" x2="533.5" y2="44.0" stroke="#4e79a7" stroke-width="2"/>
+<line x1="452.0" y1="41.0" x2="452.0" y2="47.0" stroke="#4e79a7" stroke-width="2"/>
+<line x1="533.5" y1="41.0" x2="533.5" y2="47.0" stroke="#4e79a7" stroke-width="2"/>
+<rect x="496.6" y="40.0" width="8" height="8" fill="#4e79a7" stroke="#fff" stroke-width="1"/>
 <text x="612" y="44.0" dominant-baseline="central" font-size="11" fill="#333">97.4% [96.1%, 98.3%]</text>
 <text x="8" y="72.0" dominant-baseline="central" font-size="11" fill="#333">gemini_new-cd212caa</text>
-<line x1="445.8" y1="72.0" x2="537.6" y2="72.0" stroke="#f28e2b" stroke-width="2"/>
-<line x1="445.8" y1="69.0" x2="445.8" y2="75.0" stroke="#f28e2b" stroke-width="2"/>
-<line x1="537.6" y1="69.0" x2="537.6" y2="75.0" stroke="#f28e2b" stroke-width="2"/>
-<rect x="497.7" y="68.0" width="8" height="8" fill="#f28e2b" stroke="#fff" stroke-width="1"/>
+<line x1="476.6" y1="72.0" x2="550.1" y2="72.0" stroke="#f28e2b" stroke-width="2"/>
+<line x1="476.6" y1="69.0" x2="476.6" y2="75.0" stroke="#f28e2b" stroke-width="2"/>
+<line x1="550.1" y1="69.0" x2="550.1" y2="75.0" stroke="#f28e2b" stroke-width="2"/>
+<rect x="517.4" y="68.0" width="8" height="8" fill="#f28e2b" stroke="#fff" stroke-width="1"/>
 <text x="612" y="72.0" dominant-baseline="central" font-size="11" fill="#333">97.9% [96.8%, 98.7%]</text>
 <rect x="0" y="86.0" width="750" height="28" fill="#f8f8f8"/>
 <text x="8" y="100.0" dominant-baseline="central" font-size="11" fill="#333">qwen_op-f764de6e</text>
-<line x1="377.3" y1="100.0" x2="490.7" y2="100.0" stroke="#e15759" stroke-width="2"/>
-<line x1="377.3" y1="97.0" x2="377.3" y2="103.0" stroke="#e15759" stroke-width="2"/>
-<line x1="490.7" y1="97.0" x2="490.7" y2="103.0" stroke="#e15759" stroke-width="2"/>
-<rect x="439.6" y="96.0" width="8" height="8" fill="#e15759" stroke="#fff" stroke-width="1"/>
+<line x1="421.9" y1="100.0" x2="512.5" y2="100.0" stroke="#e15759" stroke-width="2"/>
+<line x1="421.9" y1="97.0" x2="421.9" y2="103.0" stroke="#e15759" stroke-width="2"/>
+<line x1="512.5" y1="97.0" x2="512.5" y2="103.0" stroke="#e15759" stroke-width="2"/>
+<rect x="470.9" y="96.0" width="8" height="8" fill="#e15759" stroke="#fff" stroke-width="1"/>
 <text x="612" y="100.0" dominant-baseline="central" font-size="11" fill="#333">96.7% [95.3%, 97.7%]</text>
 <text x="8" y="128.0" dominant-baseline="central" font-size="11" fill="#333">qwen_np-bd957935</text>
-<line x1="352.4" y1="128.0" x2="472.7" y2="128.0" stroke="#76b7b2" stroke-width="2"/>
-<line x1="352.4" y1="125.0" x2="352.4" y2="131.0" stroke="#76b7b2" stroke-width="2"/>
-<line x1="472.7" y1="125.0" x2="472.7" y2="131.0" stroke="#76b7b2" stroke-width="2"/>
-<rect x="418.1" y="124.0" width="8" height="8" fill="#76b7b2" stroke="#fff" stroke-width="1"/>
+<line x1="401.9" y1="128.0" x2="498.2" y2="128.0" stroke="#76b7b2" stroke-width="2"/>
+<line x1="401.9" y1="125.0" x2="401.9" y2="131.0" stroke="#76b7b2" stroke-width="2"/>
+<line x1="498.2" y1="125.0" x2="498.2" y2="131.0" stroke="#76b7b2" stroke-width="2"/>
+<rect x="453.7" y="124.0" width="8" height="8" fill="#76b7b2" stroke="#fff" stroke-width="1"/>
 <text x="612" y="128.0" dominant-baseline="central" font-size="11" fill="#333">96.3% [94.8%, 97.3%]</text>
 <rect x="0" y="142.0" width="750" height="28" fill="#f8f8f8"/>
 <text x="8" y="156.0" dominant-baseline="central" font-size="11" fill="#333">ft_op-3148189a</text>
-<line x1="301.7" y1="156.0" x2="435.4" y2="156.0" stroke="#59a14f" stroke-width="2"/>
-<line x1="301.7" y1="153.0" x2="301.7" y2="159.0" stroke="#59a14f" stroke-width="2"/>
-<line x1="435.4" y1="153.0" x2="435.4" y2="159.0" stroke="#59a14f" stroke-width="2"/>
-<rect x="373.9" y="152.0" width="8" height="8" fill="#59a14f" stroke="#fff" stroke-width="1"/>
+<line x1="361.3" y1="156.0" x2="468.3" y2="156.0" stroke="#59a14f" stroke-width="2"/>
+<line x1="361.3" y1="153.0" x2="361.3" y2="159.0" stroke="#59a14f" stroke-width="2"/>
+<line x1="468.3" y1="153.0" x2="468.3" y2="159.0" stroke="#59a14f" stroke-width="2"/>
+<rect x="418.3" y="152.0" width="8" height="8" fill="#59a14f" stroke="#fff" stroke-width="1"/>
 <text x="612" y="156.0" dominant-baseline="central" font-size="11" fill="#333">95.3% [93.7%, 96.5%]</text>
 <text x="8" y="184.0" dominant-baseline="central" font-size="11" fill="#333">ft_np-b253e761</text>
-<line x1="357.5" y1="184.0" x2="476.7" y2="184.0" stroke="#edc948" stroke-width="2"/>
-<line x1="357.5" y1="181.0" x2="357.5" y2="187.0" stroke="#edc948" stroke-width="2"/>
-<line x1="476.7" y1="181.0" x2="476.7" y2="187.0" stroke="#edc948" stroke-width="2"/>
-<rect x="422.7" y="180.0" width="8" height="8" fill="#edc948" stroke="#fff" stroke-width="1"/>
+<line x1="406.0" y1="184.0" x2="501.3" y2="184.0" stroke="#edc948" stroke-width="2"/>
+<line x1="406.0" y1="181.0" x2="406.0" y2="187.0" stroke="#edc948" stroke-width="2"/>
+<line x1="501.3" y1="181.0" x2="501.3" y2="187.0" stroke="#edc948" stroke-width="2"/>
+<rect x="457.3" y="180.0" width="8" height="8" fill="#edc948" stroke="#fff" stroke-width="1"/>
 <text x="612" y="184.0" dominant-baseline="central" font-size="11" fill="#333">96.4% [94.9%, 97.4%]</text>
 <rect x="0" y="198.0" width="750" height="28" fill="#f8f8f8"/>
-<text x="8" y="212.0" dominant-baseline="central" font-size="11" fill="#333">dpo_op-6838db16</text>
-<line x1="401.5" y1="212.0" x2="507.8" y2="212.0" stroke="#b07aa1" stroke-width="2"/>
-<line x1="401.5" y1="209.0" x2="401.5" y2="215.0" stroke="#b07aa1" stroke-width="2"/>
-<line x1="507.8" y1="209.0" x2="507.8" y2="215.0" stroke="#b07aa1" stroke-width="2"/>
-<rect x="460.4" y="208.0" width="8" height="8" fill="#b07aa1" stroke="#fff" stroke-width="1"/>
-<text x="612" y="212.0" dominant-baseline="central" font-size="11" fill="#333">97.1% [95.8%, 98.1%]</text>
-<text x="8" y="240.0" dominant-baseline="central" font-size="11" fill="#333">dpo_np-f8e62689</text>
-<line x1="453.8" y1="240.0" x2="542.4" y2="240.0" stroke="#ff9da7" stroke-width="2"/>
-<line x1="453.8" y1="237.0" x2="453.8" y2="243.0" stroke="#ff9da7" stroke-width="2"/>
-<line x1="542.4" y1="237.0" x2="542.4" y2="243.0" stroke="#ff9da7" stroke-width="2"/>
-<rect x="504.0" y="236.0" width="8" height="8" fill="#ff9da7" stroke="#fff" stroke-width="1"/>
-<text x="612" y="240.0" dominant-baseline="central" font-size="11" fill="#333">98.1% [96.9%, 98.8%]</text>
-</svg></div><div class="chart-container"><h2>maintains_search_impressions</h2><svg xmlns="http://www.w3.org/2000/svg" width="750" height="284" style="font-family: inherit;">
+<text x="8" y="212.0" dominant-baseline="central" font-size="11" fill="#333">cot_fixed-56b46d63</text>
+<line x1="318.7" y1="212.0" x2="436.4" y2="212.0" stroke="#b07aa1" stroke-width="2"/>
+<line x1="318.7" y1="209.0" x2="318.7" y2="215.0" stroke="#b07aa1" stroke-width="2"/>
+<line x1="436.4" y1="209.0" x2="436.4" y2="215.0" stroke="#b07aa1" stroke-width="2"/>
+<rect x="381.0" y="208.0" width="8" height="8" fill="#b07aa1" stroke="#fff" stroke-width="1"/>
+<text x="612" y="212.0" dominant-baseline="central" font-size="11" fill="#333">94.3% [92.6%, 95.7%]</text>
+<text x="8" y="240.0" dominant-baseline="central" font-size="11" fill="#333">no_cot_fixed-8fd329ca</text>
+<line x1="401.7" y1="240.0" x2="498.1" y2="240.0" stroke="#ff9da7" stroke-width="2"/>
+<line x1="401.7" y1="237.0" x2="401.7" y2="243.0" stroke="#ff9da7" stroke-width="2"/>
+<line x1="498.1" y1="237.0" x2="498.1" y2="243.0" stroke="#ff9da7" stroke-width="2"/>
+<rect x="453.5" y="236.0" width="8" height="8" fill="#ff9da7" stroke="#fff" stroke-width="1"/>
+<text x="612" y="240.0" dominant-baseline="central" font-size="11" fill="#333">96.2% [94.8%, 97.3%]</text>
+<rect x="0" y="254.0" width="750" height="28" fill="#f8f8f8"/>
+<text x="8" y="268.0" dominant-baseline="central" font-size="11" fill="#333">dpo_op-6838db16</text>
+<line x1="441.2" y1="268.0" x2="526.3" y2="268.0" stroke="#9c755f" stroke-width="2"/>
+<line x1="441.2" y1="265.0" x2="441.2" y2="271.0" stroke="#9c755f" stroke-width="2"/>
+<line x1="526.3" y1="265.0" x2="526.3" y2="271.0" stroke="#9c755f" stroke-width="2"/>
+<rect x="487.6" y="264.0" width="8" height="8" fill="#9c755f" stroke="#fff" stroke-width="1"/>
+<text x="612" y="268.0" dominant-baseline="central" font-size="11" fill="#333">97.1% [95.8%, 98.1%]</text>
+<text x="8" y="296.0" dominant-baseline="central" font-size="11" fill="#333">dpo_np-f8e62689</text>
+<line x1="483.0" y1="296.0" x2="553.9" y2="296.0" stroke="#bab0ac" stroke-width="2"/>
+<line x1="483.0" y1="293.0" x2="483.0" y2="299.0" stroke="#bab0ac" stroke-width="2"/>
+<line x1="553.9" y1="293.0" x2="553.9" y2="299.0" stroke="#bab0ac" stroke-width="2"/>
+<rect x="522.4" y="292.0" width="8" height="8" fill="#bab0ac" stroke="#fff" stroke-width="1"/>
+<text x="612" y="296.0" dominant-baseline="central" font-size="11" fill="#333">98.1% [96.9%, 98.8%]</text>
+<rect x="0" y="310.0" width="750" height="28" fill="#f8f8f8"/>
+<text x="8" y="324.0" dominant-baseline="central" font-size="11" fill="#333">dpo_heueristics_base_ft-5f77bb3b</text>
+<line x1="532.2" y1="324.0" x2="582.5" y2="324.0" stroke="#4e79a7" stroke-width="2"/>
+<line x1="532.2" y1="321.0" x2="532.2" y2="327.0" stroke="#4e79a7" stroke-width="2"/>
+<line x1="582.5" y1="321.0" x2="582.5" y2="327.0" stroke="#4e79a7" stroke-width="2"/>
+<rect x="561.5" y="320.0" width="8" height="8" fill="#4e79a7" stroke="#fff" stroke-width="1"/>
+<text x="612" y="324.0" dominant-baseline="central" font-size="11" fill="#333">99.1% [98.2%, 99.5%]</text>
+<text x="8" y="352.0" dominant-baseline="central" font-size="11" fill="#333">dpo_heuristics_base_qwen-27612bdc</text>
+<line x1="526.7" y1="352.0" x2="579.5" y2="352.0" stroke="#f28e2b" stroke-width="2"/>
+<line x1="526.7" y1="349.0" x2="526.7" y2="355.0" stroke="#f28e2b" stroke-width="2"/>
+<line x1="579.5" y1="349.0" x2="579.5" y2="355.0" stroke="#f28e2b" stroke-width="2"/>
+<rect x="557.2" y="348.0" width="8" height="8" fill="#f28e2b" stroke="#fff" stroke-width="1"/>
+<text x="612" y="352.0" dominant-baseline="central" font-size="11" fill="#333">99.0% [98.1%, 99.5%]</text>
+<rect x="0" y="366.0" width="750" height="28" fill="#f8f8f8"/>
+<text x="8" y="380.0" dominant-baseline="central" font-size="11" fill="#333">dpo_balanced_base_ft-49defe76</text>
+<line x1="568.7" y1="380.0" x2="597.6" y2="380.0" stroke="#e15759" stroke-width="2"/>
+<line x1="568.7" y1="377.0" x2="568.7" y2="383.0" stroke="#e15759" stroke-width="2"/>
+<line x1="597.6" y1="377.0" x2="597.6" y2="383.0" stroke="#e15759" stroke-width="2"/>
+<rect x="587.4" y="376.0" width="8" height="8" fill="#e15759" stroke="#fff" stroke-width="1"/>
+<text x="612" y="380.0" dominant-baseline="central" font-size="11" fill="#333">99.8% [99.2%, 99.9%]</text>
+<line x1="208" y1="310" x2="208" y2="366" stroke="#e65100" stroke-width="2"/><line x1="208" y1="310" x2="216" y2="310" stroke="#e65100" stroke-width="2"/><line x1="208" y1="366" x2="216" y2="366" stroke="#e65100" stroke-width="2"/><rect x="220" y="436" width="220" height="24" rx="4" fill="#e65100" opacity="0.92"/><text x="330" y="452" text-anchor="middle" font-size="9" font-weight="600" fill="white">↑ DPO heuristics boosts readability</text><line x1="330" y1="436" x2="330" y2="328" stroke="#e65100" stroke-width="1.8" stroke-dasharray="4,2" marker-end="url(#arr-orange)"/><rect x="460" y="436" width="170" height="24" rx="4" fill="#2e7d32" opacity="0.92"/><text x="545" y="452" text-anchor="middle" font-size="9" font-weight="600" fill="white">✓ dpo_np / no_cot: most balanced</text><rect x="222" y="287" width="68" height="14" rx="3" fill="#2e7d32" opacity="0.9"/><text x="226" y="298" font-size="9" font-weight="600" fill="white">✓ balanced</text><rect x="0" y="226" width="750" height="28" fill="#1b5e20" opacity="0.15"/><rect x="222" y="231" width="68" height="14" rx="3" fill="#2e7d32" opacity="0.9"/><text x="226" y="242" font-size="9" font-weight="600" fill="white">✓ balanced</text></svg></div><div class="chart-container"><h2>maintains_search_impressions</h2><svg xmlns="http://www.w3.org/2000/svg" width="750" height="424" style="font-family: inherit;">
 <text x="8" y="18" font-size="11" font-weight="600" fill="#555">Experiment</text>
 <text x="410.0" y="18" text-anchor="middle" font-size="11" font-weight="600" fill="#555">Rate (95% Wilson CI)</text>
 <text x="612" y="18" font-size="11" font-weight="600" fill="#555">Value [CI]</text>
-<line x1="220.0" y1="30" x2="220.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="220.0" y="268" text-anchor="middle" font-size="10" fill="#888">94%</text>
-<line x1="296.0" y1="30" x2="296.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="296.0" y="268" text-anchor="middle" font-size="10" fill="#888">95%</text>
-<line x1="372.0" y1="30" x2="372.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="372.0" y="268" text-anchor="middle" font-size="10" fill="#888">96%</text>
-<line x1="448.0" y1="30" x2="448.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="448.0" y="268" text-anchor="middle" font-size="10" fill="#888">98%</text>
-<line x1="524.0" y1="30" x2="524.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="524.0" y="268" text-anchor="middle" font-size="10" fill="#888">99%</text>
-<line x1="600.0" y1="30" x2="600.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="600.0" y="268" text-anchor="middle" font-size="10" fill="#888">100%</text>
+<line x1="220.0" y1="30" x2="220.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="220.0" y="408" text-anchor="middle" font-size="10" fill="#888">94%</text>
+<line x1="296.0" y1="30" x2="296.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="296.0" y="408" text-anchor="middle" font-size="10" fill="#888">95%</text>
+<line x1="372.0" y1="30" x2="372.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="372.0" y="408" text-anchor="middle" font-size="10" fill="#888">96%</text>
+<line x1="448.0" y1="30" x2="448.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="448.0" y="408" text-anchor="middle" font-size="10" fill="#888">98%</text>
+<line x1="524.0" y1="30" x2="524.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="524.0" y="408" text-anchor="middle" font-size="10" fill="#888">99%</text>
+<line x1="600.0" y1="30" x2="600.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="600.0" y="408" text-anchor="middle" font-size="10" fill="#888">100%</text>
 <rect x="0" y="30.0" width="750" height="28" fill="#f8f8f8"/>
 <text x="8" y="44.0" dominant-baseline="central" font-size="11" fill="#333">gemini_old-6de1f762</text>
 <line x1="440.8" y1="44.0" x2="545.1" y2="44.0" stroke="#4e79a7" stroke-width="2"/>
@@ -325,102 +440,173 @@ clearly below gemini's 99.7&ndash;99.9%.</li>
 <rect x="509.3" y="180.0" width="8" height="8" fill="#edc948" stroke="#fff" stroke-width="1"/>
 <text x="612" y="184.0" dominant-baseline="central" font-size="11" fill="#333">98.6% [97.6%, 99.2%]</text>
 <rect x="0" y="198.0" width="750" height="28" fill="#f8f8f8"/>
-<text x="8" y="212.0" dominant-baseline="central" font-size="11" fill="#333">dpo_op-6838db16</text>
-<line x1="326.8" y1="212.0" x2="471.2" y2="212.0" stroke="#b07aa1" stroke-width="2"/>
-<line x1="326.8" y1="209.0" x2="326.8" y2="215.0" stroke="#b07aa1" stroke-width="2"/>
-<line x1="471.2" y1="209.0" x2="471.2" y2="215.0" stroke="#b07aa1" stroke-width="2"/>
-<rect x="408.0" y="208.0" width="8" height="8" fill="#b07aa1" stroke="#fff" stroke-width="1"/>
-<text x="612" y="212.0" dominant-baseline="central" font-size="11" fill="#333">97.0% [95.7%, 98.0%]</text>
-<text x="8" y="240.0" dominant-baseline="central" font-size="11" fill="#333">dpo_np-f8e62689</text>
-<line x1="378.8" y1="240.0" x2="506.3" y2="240.0" stroke="#ff9da7" stroke-width="2"/>
-<line x1="378.8" y1="237.0" x2="378.8" y2="243.0" stroke="#ff9da7" stroke-width="2"/>
-<line x1="506.3" y1="237.0" x2="506.3" y2="243.0" stroke="#ff9da7" stroke-width="2"/>
-<rect x="451.7" y="236.0" width="8" height="8" fill="#ff9da7" stroke="#fff" stroke-width="1"/>
-<text x="612" y="240.0" dominant-baseline="central" font-size="11" fill="#333">97.7% [96.5%, 98.5%]</text>
-</svg></div><div class="chart-container"><h2>passes_blocklist</h2><svg xmlns="http://www.w3.org/2000/svg" width="750" height="284" style="font-family: inherit;">
+<text x="8" y="212.0" dominant-baseline="central" font-size="11" fill="#333">cot_fixed-56b46d63</text>
+<line x1="367.0" y1="212.0" x2="499.2" y2="212.0" stroke="#b07aa1" stroke-width="2"/>
+<line x1="367.0" y1="209.0" x2="367.0" y2="215.0" stroke="#b07aa1" stroke-width="2"/>
+<line x1="499.2" y1="209.0" x2="499.2" y2="215.0" stroke="#b07aa1" stroke-width="2"/>
+<rect x="442.4" y="208.0" width="8" height="8" fill="#b07aa1" stroke="#fff" stroke-width="1"/>
+<text x="612" y="212.0" dominant-baseline="central" font-size="11" fill="#333">97.6% [96.3%, 98.4%]</text>
+<text x="8" y="240.0" dominant-baseline="central" font-size="11" fill="#333">no_cot_fixed-8fd329ca</text>
+<line x1="423.1" y1="240.0" x2="534.4" y2="240.0" stroke="#ff9da7" stroke-width="2"/>
+<line x1="423.1" y1="237.0" x2="423.1" y2="243.0" stroke="#ff9da7" stroke-width="2"/>
+<line x1="534.4" y1="237.0" x2="534.4" y2="243.0" stroke="#ff9da7" stroke-width="2"/>
+<rect x="488.0" y="236.0" width="8" height="8" fill="#ff9da7" stroke="#fff" stroke-width="1"/>
+<text x="612" y="240.0" dominant-baseline="central" font-size="11" fill="#333">98.3% [97.2%, 99.0%]</text>
+<rect x="0" y="254.0" width="750" height="28" fill="#f8f8f8"/>
+<text x="8" y="268.0" dominant-baseline="central" font-size="11" fill="#333">dpo_op-6838db16</text>
+<line x1="326.8" y1="268.0" x2="471.2" y2="268.0" stroke="#9c755f" stroke-width="2"/>
+<line x1="326.8" y1="265.0" x2="326.8" y2="271.0" stroke="#9c755f" stroke-width="2"/>
+<line x1="471.2" y1="265.0" x2="471.2" y2="271.0" stroke="#9c755f" stroke-width="2"/>
+<rect x="408.0" y="264.0" width="8" height="8" fill="#9c755f" stroke="#fff" stroke-width="1"/>
+<text x="612" y="268.0" dominant-baseline="central" font-size="11" fill="#333">97.0% [95.7%, 98.0%]</text>
+<text x="8" y="296.0" dominant-baseline="central" font-size="11" fill="#333">dpo_np-f8e62689</text>
+<line x1="378.8" y1="296.0" x2="506.3" y2="296.0" stroke="#bab0ac" stroke-width="2"/>
+<line x1="378.8" y1="293.0" x2="378.8" y2="299.0" stroke="#bab0ac" stroke-width="2"/>
+<line x1="506.3" y1="293.0" x2="506.3" y2="299.0" stroke="#bab0ac" stroke-width="2"/>
+<rect x="451.7" y="292.0" width="8" height="8" fill="#bab0ac" stroke="#fff" stroke-width="1"/>
+<text x="612" y="296.0" dominant-baseline="central" font-size="11" fill="#333">97.7% [96.5%, 98.5%]</text>
+<rect x="0" y="310.0" width="750" height="28" fill="#f8f8f8"/>
+<text x="8" y="324.0" dominant-baseline="central" font-size="11" fill="#333">dpo_heueristics_base_ft-5f77bb3b</text>
+<line x1="319.6" y1="324.0" x2="465.9" y2="324.0" stroke="#4e79a7" stroke-width="2"/>
+<line x1="319.6" y1="321.0" x2="319.6" y2="327.0" stroke="#4e79a7" stroke-width="2"/>
+<line x1="465.9" y1="321.0" x2="465.9" y2="327.0" stroke="#4e79a7" stroke-width="2"/>
+<rect x="401.7" y="320.0" width="8" height="8" fill="#4e79a7" stroke="#fff" stroke-width="1"/>
+<text x="612" y="324.0" dominant-baseline="central" font-size="11" fill="#333">96.9% [95.6%, 97.9%]</text>
+<text x="8" y="352.0" dominant-baseline="central" font-size="11" fill="#333">dpo_heuristics_base_qwen-27612bdc</text>
+<line x1="311.5" y1="352.0" x2="460.2" y2="352.0" stroke="#f28e2b" stroke-width="2"/>
+<line x1="311.5" y1="349.0" x2="311.5" y2="355.0" stroke="#f28e2b" stroke-width="2"/>
+<line x1="460.2" y1="349.0" x2="460.2" y2="355.0" stroke="#f28e2b" stroke-width="2"/>
+<rect x="394.7" y="348.0" width="8" height="8" fill="#f28e2b" stroke="#fff" stroke-width="1"/>
+<text x="612" y="352.0" dominant-baseline="central" font-size="11" fill="#333">96.8% [95.4%, 97.8%]</text>
+<rect x="0" y="366.0" width="750" height="28" fill="#f8f8f8"/>
+<text x="8" y="380.0" dominant-baseline="central" font-size="11" fill="#333">dpo_balanced_base_ft-49defe76</text>
+<line x1="362.1" y1="380.0" x2="495.1" y2="380.0" stroke="#e15759" stroke-width="2"/>
+<line x1="362.1" y1="377.0" x2="362.1" y2="383.0" stroke="#e15759" stroke-width="2"/>
+<line x1="495.1" y1="377.0" x2="495.1" y2="383.0" stroke="#e15759" stroke-width="2"/>
+<rect x="437.7" y="376.0" width="8" height="8" fill="#e15759" stroke="#fff" stroke-width="1"/>
+<text x="612" y="380.0" dominant-baseline="central" font-size="11" fill="#333">97.5% [96.2%, 98.3%]</text>
+</svg></div><div class="chart-container"><h2>passes_blocklist</h2><svg xmlns="http://www.w3.org/2000/svg" width="750" height="424" style="font-family: inherit;">
 <text x="8" y="18" font-size="11" font-weight="600" fill="#555">Experiment</text>
 <text x="410.0" y="18" text-anchor="middle" font-size="11" font-weight="600" fill="#555">Rate (95% Wilson CI)</text>
 <text x="612" y="18" font-size="11" font-weight="600" fill="#555">Value [CI]</text>
-<line x1="220.0" y1="30" x2="220.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="220.0" y="268" text-anchor="middle" font-size="10" fill="#888">89%</text>
-<line x1="296.0" y1="30" x2="296.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="296.0" y="268" text-anchor="middle" font-size="10" fill="#888">90%</text>
-<line x1="372.0" y1="30" x2="372.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="372.0" y="268" text-anchor="middle" font-size="10" fill="#888">92%</text>
-<line x1="448.0" y1="30" x2="448.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="448.0" y="268" text-anchor="middle" font-size="10" fill="#888">93%</text>
-<line x1="524.0" y1="30" x2="524.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="524.0" y="268" text-anchor="middle" font-size="10" fill="#888">95%</text>
-<line x1="600.0" y1="30" x2="600.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="600.0" y="268" text-anchor="middle" font-size="10" fill="#888">96%</text>
+<line x1="220.0" y1="30" x2="220.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="220.0" y="408" text-anchor="middle" font-size="10" fill="#888">88%</text>
+<line x1="296.0" y1="30" x2="296.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="296.0" y="408" text-anchor="middle" font-size="10" fill="#888">90%</text>
+<line x1="372.0" y1="30" x2="372.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="372.0" y="408" text-anchor="middle" font-size="10" fill="#888">92%</text>
+<line x1="448.0" y1="30" x2="448.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="448.0" y="408" text-anchor="middle" font-size="10" fill="#888">94%</text>
+<line x1="524.0" y1="30" x2="524.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="524.0" y="408" text-anchor="middle" font-size="10" fill="#888">96%</text>
+<line x1="600.0" y1="30" x2="600.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="600.0" y="408" text-anchor="middle" font-size="10" fill="#888">98%</text>
 <rect x="0" y="30.0" width="750" height="28" fill="#f8f8f8"/>
 <text x="8" y="44.0" dominant-baseline="central" font-size="11" fill="#333">gemini_old-6de1f762</text>
-<line x1="318.2" y1="44.0" x2="505.4" y2="44.0" stroke="#4e79a7" stroke-width="2"/>
-<line x1="318.2" y1="41.0" x2="318.2" y2="47.0" stroke="#4e79a7" stroke-width="2"/>
-<line x1="505.4" y1="41.0" x2="505.4" y2="47.0" stroke="#4e79a7" stroke-width="2"/>
-<rect x="417.9" y="40.0" width="8" height="8" fill="#4e79a7" stroke="#fff" stroke-width="1"/>
+<line x1="326.7" y1="44.0" x2="457.8" y2="44.0" stroke="#4e79a7" stroke-width="2"/>
+<line x1="326.7" y1="41.0" x2="326.7" y2="47.0" stroke="#4e79a7" stroke-width="2"/>
+<line x1="457.8" y1="41.0" x2="457.8" y2="47.0" stroke="#4e79a7" stroke-width="2"/>
+<rect x="395.3" y="40.0" width="8" height="8" fill="#4e79a7" stroke="#fff" stroke-width="1"/>
 <text x="612" y="44.0" dominant-baseline="central" font-size="11" fill="#333">92.7% [90.8%, 94.3%]</text>
 <text x="8" y="72.0" dominant-baseline="central" font-size="11" fill="#333">gemini_new-cd212caa</text>
-<line x1="340.7" y1="72.0" x2="524.3" y2="72.0" stroke="#f28e2b" stroke-width="2"/>
-<line x1="340.7" y1="69.0" x2="340.7" y2="75.0" stroke="#f28e2b" stroke-width="2"/>
-<line x1="524.3" y1="69.0" x2="524.3" y2="75.0" stroke="#f28e2b" stroke-width="2"/>
-<rect x="438.8" y="68.0" width="8" height="8" fill="#f28e2b" stroke="#fff" stroke-width="1"/>
+<line x1="342.5" y1="72.0" x2="471.0" y2="72.0" stroke="#f28e2b" stroke-width="2"/>
+<line x1="342.5" y1="69.0" x2="342.5" y2="75.0" stroke="#f28e2b" stroke-width="2"/>
+<line x1="471.0" y1="69.0" x2="471.0" y2="75.0" stroke="#f28e2b" stroke-width="2"/>
+<rect x="409.9" y="68.0" width="8" height="8" fill="#f28e2b" stroke="#fff" stroke-width="1"/>
 <text x="612" y="72.0" dominant-baseline="central" font-size="11" fill="#333">93.1% [91.2%, 94.6%]</text>
 <rect x="0" y="86.0" width="750" height="28" fill="#f8f8f8"/>
 <text x="8" y="100.0" dominant-baseline="central" font-size="11" fill="#333">qwen_op-f764de6e</text>
-<line x1="312.5" y1="100.0" x2="500.6" y2="100.0" stroke="#e15759" stroke-width="2"/>
-<line x1="312.5" y1="97.0" x2="312.5" y2="103.0" stroke="#e15759" stroke-width="2"/>
-<line x1="500.6" y1="97.0" x2="500.6" y2="103.0" stroke="#e15759" stroke-width="2"/>
-<rect x="412.6" y="96.0" width="8" height="8" fill="#e15759" stroke="#fff" stroke-width="1"/>
+<line x1="322.8" y1="100.0" x2="454.4" y2="100.0" stroke="#e15759" stroke-width="2"/>
+<line x1="322.8" y1="97.0" x2="322.8" y2="103.0" stroke="#e15759" stroke-width="2"/>
+<line x1="454.4" y1="97.0" x2="454.4" y2="103.0" stroke="#e15759" stroke-width="2"/>
+<rect x="391.6" y="96.0" width="8" height="8" fill="#e15759" stroke="#fff" stroke-width="1"/>
 <text x="612" y="100.0" dominant-baseline="central" font-size="11" fill="#333">92.6% [90.7%, 94.2%]</text>
 <text x="8" y="128.0" dominant-baseline="central" font-size="11" fill="#333">qwen_np-bd957935</text>
-<line x1="292.2" y1="128.0" x2="484.2" y2="128.0" stroke="#76b7b2" stroke-width="2"/>
-<line x1="292.2" y1="125.0" x2="292.2" y2="131.0" stroke="#76b7b2" stroke-width="2"/>
-<line x1="484.2" y1="125.0" x2="484.2" y2="131.0" stroke="#76b7b2" stroke-width="2"/>
-<rect x="394.1" y="124.0" width="8" height="8" fill="#76b7b2" stroke="#fff" stroke-width="1"/>
+<line x1="308.5" y1="128.0" x2="442.9" y2="128.0" stroke="#76b7b2" stroke-width="2"/>
+<line x1="308.5" y1="125.0" x2="308.5" y2="131.0" stroke="#76b7b2" stroke-width="2"/>
+<line x1="442.9" y1="125.0" x2="442.9" y2="131.0" stroke="#76b7b2" stroke-width="2"/>
+<rect x="378.7" y="124.0" width="8" height="8" fill="#76b7b2" stroke="#fff" stroke-width="1"/>
 <text x="612" y="128.0" dominant-baseline="central" font-size="11" fill="#333">92.3% [90.3%, 93.9%]</text>
 <rect x="0" y="142.0" width="750" height="28" fill="#f8f8f8"/>
 <text x="8" y="156.0" dominant-baseline="central" font-size="11" fill="#333">ft_op-3148189a</text>
-<line x1="337.6" y1="156.0" x2="521.1" y2="156.0" stroke="#59a14f" stroke-width="2"/>
-<line x1="337.6" y1="153.0" x2="337.6" y2="159.0" stroke="#59a14f" stroke-width="2"/>
-<line x1="521.1" y1="153.0" x2="521.1" y2="159.0" stroke="#59a14f" stroke-width="2"/>
-<rect x="435.6" y="152.0" width="8" height="8" fill="#59a14f" stroke="#fff" stroke-width="1"/>
+<line x1="340.3" y1="156.0" x2="468.8" y2="156.0" stroke="#59a14f" stroke-width="2"/>
+<line x1="340.3" y1="153.0" x2="340.3" y2="159.0" stroke="#59a14f" stroke-width="2"/>
+<line x1="468.8" y1="153.0" x2="468.8" y2="159.0" stroke="#59a14f" stroke-width="2"/>
+<rect x="407.7" y="152.0" width="8" height="8" fill="#59a14f" stroke="#fff" stroke-width="1"/>
 <text x="612" y="156.0" dominant-baseline="central" font-size="11" fill="#333">93.0% [91.2%, 94.5%]</text>
 <text x="8" y="184.0" dominant-baseline="central" font-size="11" fill="#333">ft_np-b253e761</text>
-<line x1="330.8" y1="184.0" x2="515.7" y2="184.0" stroke="#edc948" stroke-width="2"/>
-<line x1="330.8" y1="181.0" x2="330.8" y2="187.0" stroke="#edc948" stroke-width="2"/>
-<line x1="515.7" y1="181.0" x2="515.7" y2="187.0" stroke="#edc948" stroke-width="2"/>
-<rect x="429.4" y="180.0" width="8" height="8" fill="#edc948" stroke="#fff" stroke-width="1"/>
+<line x1="335.5" y1="184.0" x2="465.0" y2="184.0" stroke="#edc948" stroke-width="2"/>
+<line x1="335.5" y1="181.0" x2="335.5" y2="187.0" stroke="#edc948" stroke-width="2"/>
+<line x1="465.0" y1="181.0" x2="465.0" y2="187.0" stroke="#edc948" stroke-width="2"/>
+<rect x="403.4" y="180.0" width="8" height="8" fill="#edc948" stroke="#fff" stroke-width="1"/>
 <text x="612" y="184.0" dominant-baseline="central" font-size="11" fill="#333">92.9% [91.0%, 94.4%]</text>
 <rect x="0" y="198.0" width="750" height="28" fill="#f8f8f8"/>
-<text x="8" y="212.0" dominant-baseline="central" font-size="11" fill="#333">dpo_op-6838db16</text>
-<line x1="309.7" y1="212.0" x2="498.8" y2="212.0" stroke="#b07aa1" stroke-width="2"/>
-<line x1="309.7" y1="209.0" x2="309.7" y2="215.0" stroke="#b07aa1" stroke-width="2"/>
-<line x1="498.8" y1="209.0" x2="498.8" y2="215.0" stroke="#b07aa1" stroke-width="2"/>
-<rect x="410.3" y="208.0" width="8" height="8" fill="#b07aa1" stroke="#fff" stroke-width="1"/>
-<text x="612" y="212.0" dominant-baseline="central" font-size="11" fill="#333">92.6% [90.7%, 94.1%]</text>
-<text x="8" y="240.0" dominant-baseline="central" font-size="11" fill="#333">dpo_np-f8e62689</text>
-<line x1="338.1" y1="240.0" x2="521.5" y2="240.0" stroke="#ff9da7" stroke-width="2"/>
-<line x1="338.1" y1="237.0" x2="338.1" y2="243.0" stroke="#ff9da7" stroke-width="2"/>
-<line x1="521.5" y1="237.0" x2="521.5" y2="243.0" stroke="#ff9da7" stroke-width="2"/>
-<rect x="436.0" y="236.0" width="8" height="8" fill="#ff9da7" stroke="#fff" stroke-width="1"/>
+<text x="8" y="212.0" dominant-baseline="central" font-size="11" fill="#333">cot_fixed-56b46d63</text>
+<line x1="326.4" y1="212.0" x2="458.4" y2="212.0" stroke="#b07aa1" stroke-width="2"/>
+<line x1="326.4" y1="209.0" x2="326.4" y2="215.0" stroke="#b07aa1" stroke-width="2"/>
+<line x1="458.4" y1="209.0" x2="458.4" y2="215.0" stroke="#b07aa1" stroke-width="2"/>
+<rect x="395.6" y="208.0" width="8" height="8" fill="#b07aa1" stroke="#fff" stroke-width="1"/>
+<text x="612" y="212.0" dominant-baseline="central" font-size="11" fill="#333">92.7% [90.8%, 94.3%]</text>
+<text x="8" y="240.0" dominant-baseline="central" font-size="11" fill="#333">no_cot_fixed-8fd329ca</text>
+<line x1="341.5" y1="240.0" x2="469.5" y2="240.0" stroke="#ff9da7" stroke-width="2"/>
+<line x1="341.5" y1="237.0" x2="341.5" y2="243.0" stroke="#ff9da7" stroke-width="2"/>
+<line x1="469.5" y1="237.0" x2="469.5" y2="243.0" stroke="#ff9da7" stroke-width="2"/>
+<rect x="408.6" y="236.0" width="8" height="8" fill="#ff9da7" stroke="#fff" stroke-width="1"/>
 <text x="612" y="240.0" dominant-baseline="central" font-size="11" fill="#333">93.1% [91.2%, 94.6%]</text>
-</svg></div><div class="chart-container annotated"><h2>passes_heuristic</h2><svg xmlns="http://www.w3.org/2000/svg" width="750" height="324" style="font-family: inherit;">
+<rect x="0" y="254.0" width="750" height="28" fill="#f8f8f8"/>
+<text x="8" y="268.0" dominant-baseline="central" font-size="11" fill="#333">dpo_op-6838db16</text>
+<line x1="320.8" y1="268.0" x2="453.2" y2="268.0" stroke="#9c755f" stroke-width="2"/>
+<line x1="320.8" y1="265.0" x2="320.8" y2="271.0" stroke="#9c755f" stroke-width="2"/>
+<line x1="453.2" y1="265.0" x2="453.2" y2="271.0" stroke="#9c755f" stroke-width="2"/>
+<rect x="390.0" y="264.0" width="8" height="8" fill="#9c755f" stroke="#fff" stroke-width="1"/>
+<text x="612" y="268.0" dominant-baseline="central" font-size="11" fill="#333">92.6% [90.7%, 94.1%]</text>
+<text x="8" y="296.0" dominant-baseline="central" font-size="11" fill="#333">dpo_np-f8e62689</text>
+<line x1="340.7" y1="296.0" x2="469.0" y2="296.0" stroke="#bab0ac" stroke-width="2"/>
+<line x1="340.7" y1="293.0" x2="340.7" y2="299.0" stroke="#bab0ac" stroke-width="2"/>
+<line x1="469.0" y1="293.0" x2="469.0" y2="299.0" stroke="#bab0ac" stroke-width="2"/>
+<rect x="408.0" y="292.0" width="8" height="8" fill="#bab0ac" stroke="#fff" stroke-width="1"/>
+<text x="612" y="296.0" dominant-baseline="central" font-size="11" fill="#333">93.1% [91.2%, 94.6%]</text>
+<rect x="0" y="310.0" width="750" height="28" fill="#f8f8f8"/>
+<text x="8" y="324.0" dominant-baseline="central" font-size="11" fill="#333">dpo_heueristics_base_ft-5f77bb3b</text>
+<line x1="370.2" y1="324.0" x2="492.3" y2="324.0" stroke="#4e79a7" stroke-width="2"/>
+<line x1="370.2" y1="321.0" x2="370.2" y2="327.0" stroke="#4e79a7" stroke-width="2"/>
+<line x1="492.3" y1="321.0" x2="492.3" y2="327.0" stroke="#4e79a7" stroke-width="2"/>
+<rect x="434.5" y="320.0" width="8" height="8" fill="#4e79a7" stroke="#fff" stroke-width="1"/>
+<text x="612" y="324.0" dominant-baseline="central" font-size="11" fill="#333">93.8% [92.0%, 95.2%]</text>
+<text x="8" y="352.0" dominant-baseline="central" font-size="11" fill="#333">dpo_heuristics_base_qwen-27612bdc</text>
+<line x1="313.3" y1="352.0" x2="446.8" y2="352.0" stroke="#f28e2b" stroke-width="2"/>
+<line x1="313.3" y1="349.0" x2="313.3" y2="355.0" stroke="#f28e2b" stroke-width="2"/>
+<line x1="446.8" y1="349.0" x2="446.8" y2="355.0" stroke="#f28e2b" stroke-width="2"/>
+<rect x="383.0" y="348.0" width="8" height="8" fill="#f28e2b" stroke="#fff" stroke-width="1"/>
+<text x="612" y="352.0" dominant-baseline="central" font-size="11" fill="#333">92.4% [90.5%, 94.0%]</text>
+<rect x="0" y="366.0" width="750" height="28" fill="#f8f8f8"/>
+<text x="8" y="380.0" dominant-baseline="central" font-size="11" fill="#333">dpo_balanced_base_ft-49defe76</text>
+<line x1="384.7" y1="380.0" x2="503.7" y2="380.0" stroke="#e15759" stroke-width="2"/>
+<line x1="384.7" y1="377.0" x2="384.7" y2="383.0" stroke="#e15759" stroke-width="2"/>
+<line x1="503.7" y1="377.0" x2="503.7" y2="383.0" stroke="#e15759" stroke-width="2"/>
+<rect x="447.5" y="376.0" width="8" height="8" fill="#e15759" stroke="#fff" stroke-width="1"/>
+<text x="612" y="380.0" dominant-baseline="central" font-size="11" fill="#333">94.1% [92.3%, 95.5%]</text>
+</svg></div><div class="chart-container"><h2>passes_heuristic</h2><svg xmlns="http://www.w3.org/2000/svg" width="750" height="504" style="font-family: inherit;"><defs>
+  <marker id="arr-red" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#b71c1c"/></marker>
+  <marker id="arr-blue" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#0d47a1"/></marker>
+  <marker id="arr-green" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#1b5e20"/></marker>
+  <marker id="arr-orange" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#bf360c"/></marker>
+</defs><rect x="0" y="30" width="750" height="28" fill="#0d47a1" opacity="0.12"/><rect x="0" y="58" width="750" height="28" fill="#0d47a1" opacity="0.12"/><rect x="0" y="86" width="750" height="28" fill="#1565c0" opacity="0.12"/><rect x="0" y="114" width="750" height="28" fill="#1565c0" opacity="0.12"/><rect x="0" y="282" width="750" height="28" fill="#1b5e20" opacity="0.15"/>
 <text x="8" y="18" font-size="11" font-weight="600" fill="#555">Experiment</text>
 <text x="410.0" y="18" text-anchor="middle" font-size="11" font-weight="600" fill="#555">Rate (95% Wilson CI)</text>
 <text x="612" y="18" font-size="11" font-weight="600" fill="#555">Value [CI]</text>
-<line x1="220.0" y1="30" x2="220.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="220.0" y="268" text-anchor="middle" font-size="10" fill="#888">93%</text>
-<line x1="296.0" y1="30" x2="296.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="296.0" y="268" text-anchor="middle" font-size="10" fill="#888">94%</text>
-<line x1="372.0" y1="30" x2="372.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="372.0" y="268" text-anchor="middle" font-size="10" fill="#888">96%</text>
-<line x1="448.0" y1="30" x2="448.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="448.0" y="268" text-anchor="middle" font-size="10" fill="#888">97%</text>
-<line x1="524.0" y1="30" x2="524.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="524.0" y="268" text-anchor="middle" font-size="10" fill="#888">99%</text>
-<line x1="600.0" y1="30" x2="600.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="600.0" y="268" text-anchor="middle" font-size="10" fill="#888">100%</text>
+<line x1="220.0" y1="30" x2="220.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="220.0" y="408" text-anchor="middle" font-size="10" fill="#888">93%</text>
+<line x1="296.0" y1="30" x2="296.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="296.0" y="408" text-anchor="middle" font-size="10" fill="#888">94%</text>
+<line x1="372.0" y1="30" x2="372.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="372.0" y="408" text-anchor="middle" font-size="10" fill="#888">96%</text>
+<line x1="448.0" y1="30" x2="448.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="448.0" y="408" text-anchor="middle" font-size="10" fill="#888">97%</text>
+<line x1="524.0" y1="30" x2="524.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="524.0" y="408" text-anchor="middle" font-size="10" fill="#888">99%</text>
+<line x1="600.0" y1="30" x2="600.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="600.0" y="408" text-anchor="middle" font-size="10" fill="#888">100%</text>
 <rect x="0" y="30.0" width="750" height="28" fill="#f8f8f8"/>
 <text x="8" y="44.0" dominant-baseline="central" font-size="11" fill="#333">gemini_old-6de1f762</text>
 <line x1="565.2" y1="44.0" x2="598.9" y2="44.0" stroke="#4e79a7" stroke-width="2"/>
@@ -461,43 +647,67 @@ clearly below gemini's 99.7&ndash;99.9%.</li>
 <rect x="447.4" y="180.0" width="8" height="8" fill="#edc948" stroke="#fff" stroke-width="1"/>
 <text x="612" y="184.0" dominant-baseline="central" font-size="11" fill="#333">97.3% [96.0%, 98.2%]</text>
 <rect x="0" y="198.0" width="750" height="28" fill="#f8f8f8"/>
-<text x="8" y="212.0" dominant-baseline="central" font-size="11" fill="#333">dpo_op-6838db16</text>
-<line x1="315.4" y1="212.0" x2="453.7" y2="212.0" stroke="#b07aa1" stroke-width="2"/>
-<line x1="315.4" y1="209.0" x2="315.4" y2="215.0" stroke="#b07aa1" stroke-width="2"/>
-<line x1="453.7" y1="209.0" x2="453.7" y2="215.0" stroke="#b07aa1" stroke-width="2"/>
-<rect x="391.5" y="208.0" width="8" height="8" fill="#b07aa1" stroke="#fff" stroke-width="1"/>
-<text x="612" y="212.0" dominant-baseline="central" font-size="11" fill="#333">96.2% [94.8%, 97.3%]</text>
-<text x="8" y="240.0" dominant-baseline="central" font-size="11" fill="#333">dpo_np-f8e62689</text>
-<line x1="432.9" y1="240.0" x2="534.2" y2="240.0" stroke="#ff9da7" stroke-width="2"/>
-<line x1="432.9" y1="237.0" x2="432.9" y2="243.0" stroke="#ff9da7" stroke-width="2"/>
-<line x1="534.2" y1="237.0" x2="534.2" y2="243.0" stroke="#ff9da7" stroke-width="2"/>
-<rect x="490.9" y="236.0" width="8" height="8" fill="#ff9da7" stroke="#fff" stroke-width="1"/>
-<text x="612" y="240.0" dominant-baseline="central" font-size="11" fill="#333">98.1% [96.9%, 98.8%]</text>
-
-<rect x="0" y="30" width="4" height="56" fill="#16a34a"/>
-<text x="300" y="58" dominant-baseline="central" font-size="10" font-weight="700" fill="#16a34a">gemini_new 99.7% &#8776; gemini_old 99.9%</text>
-<line x1="490" y1="58" x2="535" y2="58" stroke="#16a34a" stroke-width="1.5"/>
-<path d="M 535 58 l -6 -3 l 0 6 z" fill="#16a34a"/>
-<text x="240" y="114" dominant-baseline="central" font-size="10" font-weight="700" fill="#92400e">qwen trails on heuristics &#9660;</text>
-<rect x="0" y="226" width="4" height="28" fill="#3b82f6"/>
-<rect x="8" y="290" width="734" height="28" rx="4" fill="#f0fdf4" stroke="#16a34a"/>
-<text x="20" y="304" dominant-baseline="central" font-size="11" fill="#166534">&#9650; gemini_new 99.7% &#8776; gemini_old 99.9% &#183; DPO stays high (dpo_np 98.1%) &#183; qwen performant but trails gemini (96.4&#8211;96.7%)</text>
-</svg></div><div class="chart-container"><h2>visibility_evaluated</h2><svg xmlns="http://www.w3.org/2000/svg" width="750" height="284" style="font-family: inherit;">
+<text x="8" y="212.0" dominant-baseline="central" font-size="11" fill="#333">cot_fixed-56b46d63</text>
+<line x1="564.7" y1="212.0" x2="598.9" y2="212.0" stroke="#b07aa1" stroke-width="2"/>
+<line x1="564.7" y1="209.0" x2="564.7" y2="215.0" stroke="#b07aa1" stroke-width="2"/>
+<line x1="598.9" y1="209.0" x2="598.9" y2="215.0" stroke="#b07aa1" stroke-width="2"/>
+<rect x="589.7" y="208.0" width="8" height="8" fill="#b07aa1" stroke="#fff" stroke-width="1"/>
+<text x="612" y="212.0" dominant-baseline="central" font-size="11" fill="#333">99.9% [99.3%, 100.0%]</text>
+<text x="8" y="240.0" dominant-baseline="central" font-size="11" fill="#333">no_cot_fixed-8fd329ca</text>
+<line x1="479.2" y1="240.0" x2="562.0" y2="240.0" stroke="#ff9da7" stroke-width="2"/>
+<line x1="479.2" y1="237.0" x2="479.2" y2="243.0" stroke="#ff9da7" stroke-width="2"/>
+<line x1="562.0" y1="237.0" x2="562.0" y2="243.0" stroke="#ff9da7" stroke-width="2"/>
+<rect x="528.1" y="236.0" width="8" height="8" fill="#ff9da7" stroke="#fff" stroke-width="1"/>
+<text x="612" y="240.0" dominant-baseline="central" font-size="11" fill="#333">98.8% [97.8%, 99.3%]</text>
+<rect x="0" y="254.0" width="750" height="28" fill="#f8f8f8"/>
+<text x="8" y="268.0" dominant-baseline="central" font-size="11" fill="#333">dpo_op-6838db16</text>
+<line x1="315.4" y1="268.0" x2="453.7" y2="268.0" stroke="#9c755f" stroke-width="2"/>
+<line x1="315.4" y1="265.0" x2="315.4" y2="271.0" stroke="#9c755f" stroke-width="2"/>
+<line x1="453.7" y1="265.0" x2="453.7" y2="271.0" stroke="#9c755f" stroke-width="2"/>
+<rect x="391.5" y="264.0" width="8" height="8" fill="#9c755f" stroke="#fff" stroke-width="1"/>
+<text x="612" y="268.0" dominant-baseline="central" font-size="11" fill="#333">96.2% [94.8%, 97.3%]</text>
+<text x="8" y="296.0" dominant-baseline="central" font-size="11" fill="#333">dpo_np-f8e62689</text>
+<line x1="432.9" y1="296.0" x2="534.2" y2="296.0" stroke="#bab0ac" stroke-width="2"/>
+<line x1="432.9" y1="293.0" x2="432.9" y2="299.0" stroke="#bab0ac" stroke-width="2"/>
+<line x1="534.2" y1="293.0" x2="534.2" y2="299.0" stroke="#bab0ac" stroke-width="2"/>
+<rect x="490.9" y="292.0" width="8" height="8" fill="#bab0ac" stroke="#fff" stroke-width="1"/>
+<text x="612" y="296.0" dominant-baseline="central" font-size="11" fill="#333">98.1% [96.9%, 98.8%]</text>
+<rect x="0" y="310.0" width="750" height="28" fill="#f8f8f8"/>
+<text x="8" y="324.0" dominant-baseline="central" font-size="11" fill="#333">dpo_heueristics_base_ft-5f77bb3b</text>
+<line x1="555.2" y1="324.0" x2="596.6" y2="324.0" stroke="#4e79a7" stroke-width="2"/>
+<line x1="555.2" y1="321.0" x2="555.2" y2="327.0" stroke="#4e79a7" stroke-width="2"/>
+<line x1="596.6" y1="321.0" x2="596.6" y2="327.0" stroke="#4e79a7" stroke-width="2"/>
+<rect x="583.7" y="320.0" width="8" height="8" fill="#4e79a7" stroke="#fff" stroke-width="1"/>
+<text x="612" y="324.0" dominant-baseline="central" font-size="11" fill="#333">99.8% [99.2%, 99.9%]</text>
+<text x="8" y="352.0" dominant-baseline="central" font-size="11" fill="#333">dpo_heuristics_base_qwen-27612bdc</text>
+<line x1="545.9" y1="352.0" x2="593.7" y2="352.0" stroke="#f28e2b" stroke-width="2"/>
+<line x1="545.9" y1="349.0" x2="545.9" y2="355.0" stroke="#f28e2b" stroke-width="2"/>
+<line x1="593.7" y1="349.0" x2="593.7" y2="355.0" stroke="#f28e2b" stroke-width="2"/>
+<rect x="577.5" y="348.0" width="8" height="8" fill="#f28e2b" stroke="#fff" stroke-width="1"/>
+<text x="612" y="352.0" dominant-baseline="central" font-size="11" fill="#333">99.7% [99.0%, 99.9%]</text>
+<rect x="0" y="366.0" width="750" height="28" fill="#f8f8f8"/>
+<text x="8" y="380.0" dominant-baseline="central" font-size="11" fill="#333">dpo_balanced_base_ft-49defe76</text>
+<line x1="519.7" y1="380.0" x2="583.0" y2="380.0" stroke="#e15759" stroke-width="2"/>
+<line x1="519.7" y1="377.0" x2="519.7" y2="383.0" stroke="#e15759" stroke-width="2"/>
+<line x1="583.0" y1="377.0" x2="583.0" y2="383.0" stroke="#e15759" stroke-width="2"/>
+<rect x="559.0" y="376.0" width="8" height="8" fill="#e15759" stroke="#fff" stroke-width="1"/>
+<text x="612" y="380.0" dominant-baseline="central" font-size="11" fill="#333">99.3% [98.5%, 99.7%]</text>
+<line x1="208" y1="30" x2="208" y2="142" stroke="#0d47a1" stroke-width="2"/><line x1="208" y1="30" x2="216" y2="30" stroke="#0d47a1" stroke-width="2"/><line x1="208" y1="142" x2="216" y2="142" stroke="#0d47a1" stroke-width="2"/><rect x="220" y="436" width="230" height="24" rx="4" fill="#1565c0" opacity="0.92"/><text x="335" y="452" text-anchor="middle" font-size="9" font-weight="600" fill="white">Qwen slightly below Gemini</text><line x1="335" y1="436" x2="335" y2="104" stroke="#1565c0" stroke-width="1.8" stroke-dasharray="4,2" marker-end="url(#arr-blue)"/><rect x="222" y="91" width="32" height="14" rx="3" fill="#1565c0" opacity="0.9"/><text x="226" y="102" font-size="9" font-weight="600" fill="white">qwen</text><rect x="222" y="119" width="32" height="14" rx="3" fill="#1565c0" opacity="0.9"/><text x="226" y="130" font-size="9" font-weight="600" fill="white">qwen</text><rect x="222" y="287" width="68" height="14" rx="3" fill="#2e7d32" opacity="0.9"/><text x="226" y="298" font-size="9" font-weight="600" fill="white">✓ balanced</text><rect x="460" y="436" width="170" height="24" rx="4" fill="#2e7d32" opacity="0.92"/><text x="545" y="452" text-anchor="middle" font-size="9" font-weight="600" fill="white">✓ dpo_np / no_cot: most balanced</text><rect x="0" y="226" width="750" height="28" fill="#1b5e20" opacity="0.15"/><rect x="222" y="231" width="68" height="14" rx="3" fill="#2e7d32" opacity="0.9"/><text x="226" y="242" font-size="9" font-weight="600" fill="white">✓ balanced</text></svg></div><div class="chart-container"><h2>visibility_evaluated</h2><svg xmlns="http://www.w3.org/2000/svg" width="750" height="424" style="font-family: inherit;">
 <text x="8" y="18" font-size="11" font-weight="600" fill="#555">Experiment</text>
 <text x="410.0" y="18" text-anchor="middle" font-size="11" font-weight="600" fill="#555">Rate (95% Wilson CI)</text>
 <text x="612" y="18" font-size="11" font-weight="600" fill="#555">Value [CI]</text>
-<line x1="220.0" y1="30" x2="220.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="220.0" y="268" text-anchor="middle" font-size="10" fill="#888">98%</text>
-<line x1="296.0" y1="30" x2="296.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="296.0" y="268" text-anchor="middle" font-size="10" fill="#888">98%</text>
-<line x1="372.0" y1="30" x2="372.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="372.0" y="268" text-anchor="middle" font-size="10" fill="#888">99%</text>
-<line x1="448.0" y1="30" x2="448.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="448.0" y="268" text-anchor="middle" font-size="10" fill="#888">99%</text>
-<line x1="524.0" y1="30" x2="524.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="524.0" y="268" text-anchor="middle" font-size="10" fill="#888">100%</text>
-<line x1="600.0" y1="30" x2="600.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="600.0" y="268" text-anchor="middle" font-size="10" fill="#888">100%</text>
+<line x1="220.0" y1="30" x2="220.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="220.0" y="408" text-anchor="middle" font-size="10" fill="#888">98%</text>
+<line x1="296.0" y1="30" x2="296.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="296.0" y="408" text-anchor="middle" font-size="10" fill="#888">98%</text>
+<line x1="372.0" y1="30" x2="372.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="372.0" y="408" text-anchor="middle" font-size="10" fill="#888">99%</text>
+<line x1="448.0" y1="30" x2="448.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="448.0" y="408" text-anchor="middle" font-size="10" fill="#888">99%</text>
+<line x1="524.0" y1="30" x2="524.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="524.0" y="408" text-anchor="middle" font-size="10" fill="#888">100%</text>
+<line x1="600.0" y1="30" x2="600.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="600.0" y="408" text-anchor="middle" font-size="10" fill="#888">100%</text>
 <rect x="0" y="30.0" width="750" height="28" fill="#f8f8f8"/>
 <text x="8" y="44.0" dominant-baseline="central" font-size="11" fill="#333">gemini_old-6de1f762</text>
 <line x1="517.3" y1="44.0" x2="600.0" y2="44.0" stroke="#4e79a7" stroke-width="2"/>
@@ -538,34 +748,67 @@ clearly below gemini's 99.7&ndash;99.9%.</li>
 <rect x="596.0" y="180.0" width="8" height="8" fill="#edc948" stroke="#fff" stroke-width="1"/>
 <text x="612" y="184.0" dominant-baseline="central" font-size="11" fill="#333">100.0% [99.6%, 100.0%]</text>
 <rect x="0" y="198.0" width="750" height="28" fill="#f8f8f8"/>
-<text x="8" y="212.0" dominant-baseline="central" font-size="11" fill="#333">dpo_op-6838db16</text>
-<line x1="517.0" y1="212.0" x2="600.0" y2="212.0" stroke="#b07aa1" stroke-width="2"/>
-<line x1="517.0" y1="209.0" x2="517.0" y2="215.0" stroke="#b07aa1" stroke-width="2"/>
+<text x="8" y="212.0" dominant-baseline="central" font-size="11" fill="#333">cot_fixed-56b46d63</text>
+<line x1="516.1" y1="212.0" x2="600.0" y2="212.0" stroke="#b07aa1" stroke-width="2"/>
+<line x1="516.1" y1="209.0" x2="516.1" y2="215.0" stroke="#b07aa1" stroke-width="2"/>
 <line x1="600.0" y1="209.0" x2="600.0" y2="215.0" stroke="#b07aa1" stroke-width="2"/>
 <rect x="596.0" y="208.0" width="8" height="8" fill="#b07aa1" stroke="#fff" stroke-width="1"/>
 <text x="612" y="212.0" dominant-baseline="central" font-size="11" fill="#333">100.0% [99.6%, 100.0%]</text>
-<text x="8" y="240.0" dominant-baseline="central" font-size="11" fill="#333">dpo_np-f8e62689</text>
-<line x1="517.2" y1="240.0" x2="600.0" y2="240.0" stroke="#ff9da7" stroke-width="2"/>
-<line x1="517.2" y1="237.0" x2="517.2" y2="243.0" stroke="#ff9da7" stroke-width="2"/>
+<text x="8" y="240.0" dominant-baseline="central" font-size="11" fill="#333">no_cot_fixed-8fd329ca</text>
+<line x1="517.4" y1="240.0" x2="600.0" y2="240.0" stroke="#ff9da7" stroke-width="2"/>
+<line x1="517.4" y1="237.0" x2="517.4" y2="243.0" stroke="#ff9da7" stroke-width="2"/>
 <line x1="600.0" y1="237.0" x2="600.0" y2="243.0" stroke="#ff9da7" stroke-width="2"/>
 <rect x="596.0" y="236.0" width="8" height="8" fill="#ff9da7" stroke="#fff" stroke-width="1"/>
 <text x="612" y="240.0" dominant-baseline="central" font-size="11" fill="#333">100.0% [99.6%, 100.0%]</text>
-</svg></div><div class="chart-container"><h2>Cost per 1000 Rows</h2><svg xmlns="http://www.w3.org/2000/svg" width="750" height="284" style="font-family: inherit;">
+<rect x="0" y="254.0" width="750" height="28" fill="#f8f8f8"/>
+<text x="8" y="268.0" dominant-baseline="central" font-size="11" fill="#333">dpo_op-6838db16</text>
+<line x1="517.0" y1="268.0" x2="600.0" y2="268.0" stroke="#9c755f" stroke-width="2"/>
+<line x1="517.0" y1="265.0" x2="517.0" y2="271.0" stroke="#9c755f" stroke-width="2"/>
+<line x1="600.0" y1="265.0" x2="600.0" y2="271.0" stroke="#9c755f" stroke-width="2"/>
+<rect x="596.0" y="264.0" width="8" height="8" fill="#9c755f" stroke="#fff" stroke-width="1"/>
+<text x="612" y="268.0" dominant-baseline="central" font-size="11" fill="#333">100.0% [99.6%, 100.0%]</text>
+<text x="8" y="296.0" dominant-baseline="central" font-size="11" fill="#333">dpo_np-f8e62689</text>
+<line x1="517.2" y1="296.0" x2="600.0" y2="296.0" stroke="#bab0ac" stroke-width="2"/>
+<line x1="517.2" y1="293.0" x2="517.2" y2="299.0" stroke="#bab0ac" stroke-width="2"/>
+<line x1="600.0" y1="293.0" x2="600.0" y2="299.0" stroke="#bab0ac" stroke-width="2"/>
+<rect x="596.0" y="292.0" width="8" height="8" fill="#bab0ac" stroke="#fff" stroke-width="1"/>
+<text x="612" y="296.0" dominant-baseline="central" font-size="11" fill="#333">100.0% [99.6%, 100.0%]</text>
+<rect x="0" y="310.0" width="750" height="28" fill="#f8f8f8"/>
+<text x="8" y="324.0" dominant-baseline="central" font-size="11" fill="#333">dpo_heueristics_base_ft-5f77bb3b</text>
+<line x1="517.4" y1="324.0" x2="600.0" y2="324.0" stroke="#4e79a7" stroke-width="2"/>
+<line x1="517.4" y1="321.0" x2="517.4" y2="327.0" stroke="#4e79a7" stroke-width="2"/>
+<line x1="600.0" y1="321.0" x2="600.0" y2="327.0" stroke="#4e79a7" stroke-width="2"/>
+<rect x="596.0" y="320.0" width="8" height="8" fill="#4e79a7" stroke="#fff" stroke-width="1"/>
+<text x="612" y="324.0" dominant-baseline="central" font-size="11" fill="#333">100.0% [99.6%, 100.0%]</text>
+<text x="8" y="352.0" dominant-baseline="central" font-size="11" fill="#333">dpo_heuristics_base_qwen-27612bdc</text>
+<line x1="517.5" y1="352.0" x2="600.0" y2="352.0" stroke="#f28e2b" stroke-width="2"/>
+<line x1="517.5" y1="349.0" x2="517.5" y2="355.0" stroke="#f28e2b" stroke-width="2"/>
+<line x1="600.0" y1="349.0" x2="600.0" y2="355.0" stroke="#f28e2b" stroke-width="2"/>
+<rect x="596.0" y="348.0" width="8" height="8" fill="#f28e2b" stroke="#fff" stroke-width="1"/>
+<text x="612" y="352.0" dominant-baseline="central" font-size="11" fill="#333">100.0% [99.6%, 100.0%]</text>
+<rect x="0" y="366.0" width="750" height="28" fill="#f8f8f8"/>
+<text x="8" y="380.0" dominant-baseline="central" font-size="11" fill="#333">dpo_balanced_base_ft-49defe76</text>
+<line x1="517.4" y1="380.0" x2="600.0" y2="380.0" stroke="#e15759" stroke-width="2"/>
+<line x1="517.4" y1="377.0" x2="517.4" y2="383.0" stroke="#e15759" stroke-width="2"/>
+<line x1="600.0" y1="377.0" x2="600.0" y2="383.0" stroke="#e15759" stroke-width="2"/>
+<rect x="596.0" y="376.0" width="8" height="8" fill="#e15759" stroke="#fff" stroke-width="1"/>
+<text x="612" y="380.0" dominant-baseline="central" font-size="11" fill="#333">100.0% [99.6%, 100.0%]</text>
+</svg></div><div class="chart-container"><h2>Cost per 1000 Rows</h2><svg xmlns="http://www.w3.org/2000/svg" width="750" height="424" style="font-family: inherit;">
 <text x="8" y="18" font-size="11" font-weight="600" fill="#555">Experiment</text>
 <text x="410.0" y="18" text-anchor="middle" font-size="11" font-weight="600" fill="#555">Cost per 1000 rows</text>
 <text x="612" y="18" font-size="11" font-weight="600" fill="#555">Value</text>
-<line x1="220.0" y1="30" x2="220.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="220.0" y="268" text-anchor="middle" font-size="10" fill="#888">0.000</text>
-<line x1="296.0" y1="30" x2="296.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="296.0" y="268" text-anchor="middle" font-size="10" fill="#888">0.071</text>
-<line x1="372.0" y1="30" x2="372.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="372.0" y="268" text-anchor="middle" font-size="10" fill="#888">0.142</text>
-<line x1="448.0" y1="30" x2="448.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="448.0" y="268" text-anchor="middle" font-size="10" fill="#888">0.213</text>
-<line x1="524.0" y1="30" x2="524.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="524.0" y="268" text-anchor="middle" font-size="10" fill="#888">0.284</text>
-<line x1="600.0" y1="30" x2="600.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="600.0" y="268" text-anchor="middle" font-size="10" fill="#888">0.355</text>
+<line x1="220.0" y1="30" x2="220.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="220.0" y="408" text-anchor="middle" font-size="10" fill="#888">0.000</text>
+<line x1="296.0" y1="30" x2="296.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="296.0" y="408" text-anchor="middle" font-size="10" fill="#888">0.071</text>
+<line x1="372.0" y1="30" x2="372.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="372.0" y="408" text-anchor="middle" font-size="10" fill="#888">0.142</text>
+<line x1="448.0" y1="30" x2="448.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="448.0" y="408" text-anchor="middle" font-size="10" fill="#888">0.213</text>
+<line x1="524.0" y1="30" x2="524.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="524.0" y="408" text-anchor="middle" font-size="10" fill="#888">0.284</text>
+<line x1="600.0" y1="30" x2="600.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="600.0" y="408" text-anchor="middle" font-size="10" fill="#888">0.355</text>
 <rect x="0" y="30.0" width="750" height="28" fill="#f8f8f8"/>
 <text x="8" y="44.0" dominant-baseline="central" font-size="11" fill="#333">gemini_old-6de1f762</text>
 <rect x="546.4" y="40.0" width="8" height="8" fill="#4e79a7" stroke="#fff" stroke-width="1"/>
@@ -584,26 +827,39 @@ clearly below gemini's 99.7&ndash;99.9%.</li>
 <text x="8" y="184.0" dominant-baseline="central" font-size="11" fill="#333">ft_np-b253e761</text>
 <text x="612" y="184.0" dominant-baseline="central" font-size="11" fill="#999">N/A</text>
 <rect x="0" y="198.0" width="750" height="28" fill="#f8f8f8"/>
-<text x="8" y="212.0" dominant-baseline="central" font-size="11" fill="#333">dpo_op-6838db16</text>
+<text x="8" y="212.0" dominant-baseline="central" font-size="11" fill="#333">cot_fixed-56b46d63</text>
 <text x="612" y="212.0" dominant-baseline="central" font-size="11" fill="#999">N/A</text>
-<text x="8" y="240.0" dominant-baseline="central" font-size="11" fill="#333">dpo_np-f8e62689</text>
+<text x="8" y="240.0" dominant-baseline="central" font-size="11" fill="#333">no_cot_fixed-8fd329ca</text>
 <text x="612" y="240.0" dominant-baseline="central" font-size="11" fill="#999">N/A</text>
-</svg></div><div class="chart-container"><h2>Latency p50</h2><svg xmlns="http://www.w3.org/2000/svg" width="750" height="284" style="font-family: inherit;">
+<rect x="0" y="254.0" width="750" height="28" fill="#f8f8f8"/>
+<text x="8" y="268.0" dominant-baseline="central" font-size="11" fill="#333">dpo_op-6838db16</text>
+<text x="612" y="268.0" dominant-baseline="central" font-size="11" fill="#999">N/A</text>
+<text x="8" y="296.0" dominant-baseline="central" font-size="11" fill="#333">dpo_np-f8e62689</text>
+<text x="612" y="296.0" dominant-baseline="central" font-size="11" fill="#999">N/A</text>
+<rect x="0" y="310.0" width="750" height="28" fill="#f8f8f8"/>
+<text x="8" y="324.0" dominant-baseline="central" font-size="11" fill="#333">dpo_heueristics_base_ft-5f77bb3b</text>
+<text x="612" y="324.0" dominant-baseline="central" font-size="11" fill="#999">N/A</text>
+<text x="8" y="352.0" dominant-baseline="central" font-size="11" fill="#333">dpo_heuristics_base_qwen-27612bdc</text>
+<text x="612" y="352.0" dominant-baseline="central" font-size="11" fill="#999">N/A</text>
+<rect x="0" y="366.0" width="750" height="28" fill="#f8f8f8"/>
+<text x="8" y="380.0" dominant-baseline="central" font-size="11" fill="#333">dpo_balanced_base_ft-49defe76</text>
+<text x="612" y="380.0" dominant-baseline="central" font-size="11" fill="#999">N/A</text>
+</svg></div><div class="chart-container"><h2>Latency p50</h2><svg xmlns="http://www.w3.org/2000/svg" width="750" height="424" style="font-family: inherit;">
 <text x="8" y="18" font-size="11" font-weight="600" fill="#555">Experiment</text>
 <text x="410.0" y="18" text-anchor="middle" font-size="11" font-weight="600" fill="#555">Latency p50 (seconds)</text>
 <text x="612" y="18" font-size="11" font-weight="600" fill="#555">Value</text>
-<line x1="220.0" y1="30" x2="220.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="220.0" y="268" text-anchor="middle" font-size="10" fill="#888">0.0</text>
-<line x1="296.0" y1="30" x2="296.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="296.0" y="268" text-anchor="middle" font-size="10" fill="#888">6.8</text>
-<line x1="372.0" y1="30" x2="372.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="372.0" y="268" text-anchor="middle" font-size="10" fill="#888">13.6</text>
-<line x1="448.0" y1="30" x2="448.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="448.0" y="268" text-anchor="middle" font-size="10" fill="#888">20.4</text>
-<line x1="524.0" y1="30" x2="524.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="524.0" y="268" text-anchor="middle" font-size="10" fill="#888">27.3</text>
-<line x1="600.0" y1="30" x2="600.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="600.0" y="268" text-anchor="middle" font-size="10" fill="#888">34.1</text>
+<line x1="220.0" y1="30" x2="220.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="220.0" y="408" text-anchor="middle" font-size="10" fill="#888">0.0</text>
+<line x1="296.0" y1="30" x2="296.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="296.0" y="408" text-anchor="middle" font-size="10" fill="#888">6.8</text>
+<line x1="372.0" y1="30" x2="372.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="372.0" y="408" text-anchor="middle" font-size="10" fill="#888">13.6</text>
+<line x1="448.0" y1="30" x2="448.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="448.0" y="408" text-anchor="middle" font-size="10" fill="#888">20.4</text>
+<line x1="524.0" y1="30" x2="524.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="524.0" y="408" text-anchor="middle" font-size="10" fill="#888">27.3</text>
+<line x1="600.0" y1="30" x2="600.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="600.0" y="408" text-anchor="middle" font-size="10" fill="#888">34.1</text>
 <rect x="0" y="30.0" width="750" height="28" fill="#f8f8f8"/>
 <text x="8" y="44.0" dominant-baseline="central" font-size="11" fill="#333">gemini_old-6de1f762</text>
 <rect x="238.7" y="40.0" width="8" height="8" fill="#4e79a7" stroke="#fff" stroke-width="1"/>
@@ -626,68 +882,130 @@ clearly below gemini's 99.7&ndash;99.9%.</li>
 <rect x="380.7" y="180.0" width="8" height="8" fill="#edc948" stroke="#fff" stroke-width="1"/>
 <text x="612" y="184.0" dominant-baseline="central" font-size="11" fill="#333">14.8</text>
 <rect x="0" y="198.0" width="750" height="28" fill="#f8f8f8"/>
-<text x="8" y="212.0" dominant-baseline="central" font-size="11" fill="#333">dpo_op-6838db16</text>
-<rect x="262.6" y="208.0" width="8" height="8" fill="#b07aa1" stroke="#fff" stroke-width="1"/>
-<text x="612" y="212.0" dominant-baseline="central" font-size="11" fill="#333">4.2</text>
-<text x="8" y="240.0" dominant-baseline="central" font-size="11" fill="#333">dpo_np-f8e62689</text>
-<rect x="258.0" y="236.0" width="8" height="8" fill="#ff9da7" stroke="#fff" stroke-width="1"/>
-<text x="612" y="240.0" dominant-baseline="central" font-size="11" fill="#333">3.8</text>
-</svg></div><div class="chart-container"><h2>Latency p95</h2><svg xmlns="http://www.w3.org/2000/svg" width="750" height="284" style="font-family: inherit;">
+<text x="8" y="212.0" dominant-baseline="central" font-size="11" fill="#333">cot_fixed-56b46d63</text>
+<rect x="442.9" y="208.0" width="8" height="8" fill="#b07aa1" stroke="#fff" stroke-width="1"/>
+<text x="612" y="212.0" dominant-baseline="central" font-size="11" fill="#333">20.3</text>
+<text x="8" y="240.0" dominant-baseline="central" font-size="11" fill="#333">no_cot_fixed-8fd329ca</text>
+<rect x="229.8" y="236.0" width="8" height="8" fill="#ff9da7" stroke="#fff" stroke-width="1"/>
+<text x="612" y="240.0" dominant-baseline="central" font-size="11" fill="#333">1.2</text>
+<rect x="0" y="254.0" width="750" height="28" fill="#f8f8f8"/>
+<text x="8" y="268.0" dominant-baseline="central" font-size="11" fill="#333">dpo_op-6838db16</text>
+<rect x="262.6" y="264.0" width="8" height="8" fill="#9c755f" stroke="#fff" stroke-width="1"/>
+<text x="612" y="268.0" dominant-baseline="central" font-size="11" fill="#333">4.2</text>
+<text x="8" y="296.0" dominant-baseline="central" font-size="11" fill="#333">dpo_np-f8e62689</text>
+<rect x="258.0" y="292.0" width="8" height="8" fill="#bab0ac" stroke="#fff" stroke-width="1"/>
+<text x="612" y="296.0" dominant-baseline="central" font-size="11" fill="#333">3.8</text>
+<rect x="0" y="310.0" width="750" height="28" fill="#f8f8f8"/>
+<text x="8" y="324.0" dominant-baseline="central" font-size="11" fill="#333">dpo_heueristics_base_ft-5f77bb3b</text>
+<rect x="248.8" y="320.0" width="8" height="8" fill="#4e79a7" stroke="#fff" stroke-width="1"/>
+<text x="612" y="324.0" dominant-baseline="central" font-size="11" fill="#333">2.9</text>
+<text x="8" y="352.0" dominant-baseline="central" font-size="11" fill="#333">dpo_heuristics_base_qwen-27612bdc</text>
+<rect x="249.6" y="348.0" width="8" height="8" fill="#f28e2b" stroke="#fff" stroke-width="1"/>
+<text x="612" y="352.0" dominant-baseline="central" font-size="11" fill="#333">3.0</text>
+<rect x="0" y="366.0" width="750" height="28" fill="#f8f8f8"/>
+<text x="8" y="380.0" dominant-baseline="central" font-size="11" fill="#333">dpo_balanced_base_ft-49defe76</text>
+<rect x="231.8" y="376.0" width="8" height="8" fill="#e15759" stroke="#fff" stroke-width="1"/>
+<text x="612" y="380.0" dominant-baseline="central" font-size="11" fill="#333">1.4</text>
+</svg></div><div class="chart-container"><h2>Latency p95</h2><svg xmlns="http://www.w3.org/2000/svg" width="750" height="424" style="font-family: inherit;">
 <text x="8" y="18" font-size="11" font-weight="600" fill="#555">Experiment</text>
 <text x="410.0" y="18" text-anchor="middle" font-size="11" font-weight="600" fill="#555">Latency p95 (seconds)</text>
 <text x="612" y="18" font-size="11" font-weight="600" fill="#555">Value</text>
-<line x1="220.0" y1="30" x2="220.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="220.0" y="268" text-anchor="middle" font-size="10" fill="#888">0.0</text>
-<line x1="296.0" y1="30" x2="296.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="296.0" y="268" text-anchor="middle" font-size="10" fill="#888">18.7</text>
-<line x1="372.0" y1="30" x2="372.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="372.0" y="268" text-anchor="middle" font-size="10" fill="#888">37.4</text>
-<line x1="448.0" y1="30" x2="448.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="448.0" y="268" text-anchor="middle" font-size="10" fill="#888">56.1</text>
-<line x1="524.0" y1="30" x2="524.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="524.0" y="268" text-anchor="middle" font-size="10" fill="#888">74.8</text>
-<line x1="600.0" y1="30" x2="600.0" y2="254" stroke="#e8e8e8" stroke-width="1"/>
-<text x="600.0" y="268" text-anchor="middle" font-size="10" fill="#888">93.5</text>
+<line x1="220.0" y1="30" x2="220.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="220.0" y="408" text-anchor="middle" font-size="10" fill="#888">0.0</text>
+<line x1="296.0" y1="30" x2="296.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="296.0" y="408" text-anchor="middle" font-size="10" fill="#888">26.4</text>
+<line x1="372.0" y1="30" x2="372.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="372.0" y="408" text-anchor="middle" font-size="10" fill="#888">52.8</text>
+<line x1="448.0" y1="30" x2="448.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="448.0" y="408" text-anchor="middle" font-size="10" fill="#888">79.2</text>
+<line x1="524.0" y1="30" x2="524.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="524.0" y="408" text-anchor="middle" font-size="10" fill="#888">105.5</text>
+<line x1="600.0" y1="30" x2="600.0" y2="394" stroke="#e8e8e8" stroke-width="1"/>
+<text x="600.0" y="408" text-anchor="middle" font-size="10" fill="#888">131.9</text>
 <rect x="0" y="30.0" width="750" height="28" fill="#f8f8f8"/>
 <text x="8" y="44.0" dominant-baseline="central" font-size="11" fill="#333">gemini_old-6de1f762</text>
-<rect x="261.0" y="40.0" width="8" height="8" fill="#4e79a7" stroke="#fff" stroke-width="1"/>
+<rect x="247.9" y="40.0" width="8" height="8" fill="#4e79a7" stroke="#fff" stroke-width="1"/>
 <text x="612" y="44.0" dominant-baseline="central" font-size="11" fill="#333">11.1</text>
 <text x="8" y="72.0" dominant-baseline="central" font-size="11" fill="#333">gemini_new-cd212caa</text>
-<rect x="258.5" y="68.0" width="8" height="8" fill="#f28e2b" stroke="#fff" stroke-width="1"/>
+<rect x="246.1" y="68.0" width="8" height="8" fill="#f28e2b" stroke="#fff" stroke-width="1"/>
 <text x="612" y="72.0" dominant-baseline="central" font-size="11" fill="#333">10.5</text>
 <rect x="0" y="86.0" width="750" height="28" fill="#f8f8f8"/>
 <text x="8" y="100.0" dominant-baseline="central" font-size="11" fill="#333">qwen_op-f764de6e</text>
-<rect x="500.9" y="96.0" width="8" height="8" fill="#e15759" stroke="#fff" stroke-width="1"/>
+<rect x="417.9" y="96.0" width="8" height="8" fill="#e15759" stroke="#fff" stroke-width="1"/>
 <text x="612" y="100.0" dominant-baseline="central" font-size="11" fill="#333">70.1</text>
 <text x="8" y="128.0" dominant-baseline="central" font-size="11" fill="#333">qwen_np-bd957935</text>
-<rect x="546.4" y="124.0" width="8" height="8" fill="#76b7b2" stroke="#fff" stroke-width="1"/>
+<rect x="450.2" y="124.0" width="8" height="8" fill="#76b7b2" stroke="#fff" stroke-width="1"/>
 <text x="612" y="128.0" dominant-baseline="central" font-size="11" fill="#333">81.3</text>
 <rect x="0" y="142.0" width="750" height="28" fill="#f8f8f8"/>
 <text x="8" y="156.0" dominant-baseline="central" font-size="11" fill="#333">ft_op-3148189a</text>
-<rect x="320.6" y="152.0" width="8" height="8" fill="#59a14f" stroke="#fff" stroke-width="1"/>
+<rect x="290.1" y="152.0" width="8" height="8" fill="#59a14f" stroke="#fff" stroke-width="1"/>
 <text x="612" y="156.0" dominant-baseline="central" font-size="11" fill="#333">25.7</text>
 <text x="8" y="184.0" dominant-baseline="central" font-size="11" fill="#333">ft_np-b253e761</text>
-<rect x="372.2" y="180.0" width="8" height="8" fill="#edc948" stroke="#fff" stroke-width="1"/>
+<rect x="326.7" y="180.0" width="8" height="8" fill="#edc948" stroke="#fff" stroke-width="1"/>
 <text x="612" y="184.0" dominant-baseline="central" font-size="11" fill="#333">38.4</text>
 <rect x="0" y="198.0" width="750" height="28" fill="#f8f8f8"/>
-<text x="8" y="212.0" dominant-baseline="central" font-size="11" fill="#333">dpo_op-6838db16</text>
-<rect x="285.7" y="208.0" width="8" height="8" fill="#b07aa1" stroke="#fff" stroke-width="1"/>
-<text x="612" y="212.0" dominant-baseline="central" font-size="11" fill="#333">17.1</text>
-<text x="8" y="240.0" dominant-baseline="central" font-size="11" fill="#333">dpo_np-f8e62689</text>
-<rect x="297.2" y="236.0" width="8" height="8" fill="#ff9da7" stroke="#fff" stroke-width="1"/>
-<text x="612" y="240.0" dominant-baseline="central" font-size="11" fill="#333">20.0</text>
+<text x="8" y="212.0" dominant-baseline="central" font-size="11" fill="#333">cot_fixed-56b46d63</text>
+<rect x="546.4" y="208.0" width="8" height="8" fill="#b07aa1" stroke="#fff" stroke-width="1"/>
+<text x="612" y="212.0" dominant-baseline="central" font-size="11" fill="#333">114.7</text>
+<text x="8" y="240.0" dominant-baseline="central" font-size="11" fill="#333">no_cot_fixed-8fd329ca</text>
+<rect x="265.1" y="236.0" width="8" height="8" fill="#ff9da7" stroke="#fff" stroke-width="1"/>
+<text x="612" y="240.0" dominant-baseline="central" font-size="11" fill="#333">17.0</text>
+<rect x="0" y="254.0" width="750" height="28" fill="#f8f8f8"/>
+<text x="8" y="268.0" dominant-baseline="central" font-size="11" fill="#333">dpo_op-6838db16</text>
+<rect x="265.4" y="264.0" width="8" height="8" fill="#9c755f" stroke="#fff" stroke-width="1"/>
+<text x="612" y="268.0" dominant-baseline="central" font-size="11" fill="#333">17.1</text>
+<text x="8" y="296.0" dominant-baseline="central" font-size="11" fill="#333">dpo_np-f8e62689</text>
+<rect x="273.5" y="292.0" width="8" height="8" fill="#bab0ac" stroke="#fff" stroke-width="1"/>
+<text x="612" y="296.0" dominant-baseline="central" font-size="11" fill="#333">20.0</text>
+<rect x="0" y="310.0" width="750" height="28" fill="#f8f8f8"/>
+<text x="8" y="324.0" dominant-baseline="central" font-size="11" fill="#333">dpo_heueristics_base_ft-5f77bb3b</text>
+<rect x="255.9" y="320.0" width="8" height="8" fill="#4e79a7" stroke="#fff" stroke-width="1"/>
+<text x="612" y="324.0" dominant-baseline="central" font-size="11" fill="#333">13.9</text>
+<text x="8" y="352.0" dominant-baseline="central" font-size="11" fill="#333">dpo_heuristics_base_qwen-27612bdc</text>
+<rect x="256.6" y="348.0" width="8" height="8" fill="#f28e2b" stroke="#fff" stroke-width="1"/>
+<text x="612" y="352.0" dominant-baseline="central" font-size="11" fill="#333">14.1</text>
+<rect x="0" y="366.0" width="750" height="28" fill="#f8f8f8"/>
+<text x="8" y="380.0" dominant-baseline="central" font-size="11" fill="#333">dpo_balanced_base_ft-49defe76</text>
+<rect x="257.5" y="376.0" width="8" height="8" fill="#e15759" stroke="#fff" stroke-width="1"/>
+<text x="612" y="380.0" dominant-baseline="central" font-size="11" fill="#333">14.4</text>
 </svg></div>
 </div>
 
 <h2>Summary Table</h2>
 <table>
-  <thead><tr><th style="text-align:left">Metric</th><th>gemini_old-6de1f762</th><th>gemini_new-cd212caa</th><th>qwen_op-f764de6e</th><th>qwen_np-bd957935</th><th>ft_op-3148189a</th><th>ft_np-b253e761</th><th>dpo_op-6838db16</th><th>dpo_np-f8e62689</th></tr></thead>
-  <tbody><tr><td class='metric-name'>is_grounded</td><td>93.6% <span class='ci'>[91.8%, 95.1%]</span> <span class='n'>(n=878, wilson)</span></td><td>93.2% <span class='ci'>[91.3%, 94.7%]</span> <span class='n'>(n=869, wilson)</span></td><td>90.3% <span class='ci'>[88.2%, 92.1%]</span> <span class='n'>(n=879, wilson)</span></td><td>95.0% <span class='ci'>[93.3%, 96.2%]</span> <span class='n'>(n=877, wilson)</span></td><td>94.7% <span class='ci'>[93.1%, 96.0%]</span> <span class='n'>(n=876, wilson)</span></td><td>95.8% <span class='ci'>[94.2%, 96.9%]</span> <span class='n'>(n=877, wilson)</span></td><td>93.3% <span class='ci'>[91.4%, 94.7%]</span> <span class='n'>(n=875, wilson)</span></td><td>93.9% <span class='ci'>[92.2%, 95.3%]</span> <span class='n'>(n=876, wilson)</span></td></tr><tr><td class='metric-name'>is_not_poor</td><td>84.3% <span class='ci'>[81.7%, 86.6%]</span> <span class='n'>(n=879, wilson)</span></td><td>83.0% <span class='ci'>[80.3%, 85.3%]</span> <span class='n'>(n=870, wilson)</span></td><td>89.8% <span class='ci'>[87.6%, 91.6%]</span> <span class='n'>(n=881, wilson)</span></td><td>82.9% <span class='ci'>[80.2%, 85.2%]</span> <span class='n'>(n=881, wilson)</span></td><td>80.2% <span class='ci'>[77.4%, 82.7%]</span> <span class='n'>(n=877, wilson)</span></td><td>76.1% <span class='ci'>[73.1%, 78.8%]</span> <span class='n'>(n=877, wilson)</span></td><td>87.8% <span class='ci'>[85.5%, 89.8%]</span> <span class='n'>(n=876, wilson)</span></td><td>88.6% <span class='ci'>[86.3%, 90.5%]</span> <span class='n'>(n=878, wilson)</span></td></tr><tr><td class='metric-name'>is_readable</td><td>97.4% <span class='ci'>[96.1%, 98.3%]</span> <span class='n'>(n=879, wilson)</span></td><td>97.9% <span class='ci'>[96.8%, 98.7%]</span> <span class='n'>(n=870, wilson)</span></td><td>96.7% <span class='ci'>[95.3%, 97.7%]</span> <span class='n'>(n=881, wilson)</span></td><td>96.3% <span class='ci'>[94.8%, 97.3%]</span> <span class='n'>(n=881, wilson)</span></td><td>95.3% <span class='ci'>[93.7%, 96.5%]</span> <span class='n'>(n=877, wilson)</span></td><td>96.4% <span class='ci'>[94.9%, 97.4%]</span> <span class='n'>(n=877, wilson)</span></td><td>97.1% <span class='ci'>[95.8%, 98.1%]</span> <span class='n'>(n=876, wilson)</span></td><td>98.1% <span class='ci'>[96.9%, 98.8%]</span> <span class='n'>(n=878, wilson)</span></td></tr><tr><td class='metric-name'>maintains_search_impressions</td><td>98.5% <span class='ci'>[97.5%, 99.1%]</span> <span class='n'>(n=879, wilson)</span></td><td>98.4% <span class='ci'>[97.3%, 99.0%]</span> <span class='n'>(n=870, wilson)</span></td><td>97.8% <span class='ci'>[96.7%, 98.6%]</span> <span class='n'>(n=881, wilson)</span></td><td>98.0% <span class='ci'>[96.8%, 98.7%]</span> <span class='n'>(n=881, wilson)</span></td><td>97.6% <span class='ci'>[96.4%, 98.4%]</span> <span class='n'>(n=877, wilson)</span></td><td>98.6% <span class='ci'>[97.6%, 99.2%]</span> <span class='n'>(n=877, wilson)</span></td><td>97.0% <span class='ci'>[95.7%, 98.0%]</span> <span class='n'>(n=876, wilson)</span></td><td>97.7% <span class='ci'>[96.5%, 98.5%]</span> <span class='n'>(n=878, wilson)</span></td></tr><tr><td class='metric-name'>passes_blocklist</td><td>92.7% <span class='ci'>[90.8%, 94.3%]</span> <span class='n'>(n=879, wilson)</span></td><td>93.1% <span class='ci'>[91.2%, 94.6%]</span> <span class='n'>(n=870, wilson)</span></td><td>92.6% <span class='ci'>[90.7%, 94.2%]</span> <span class='n'>(n=881, wilson)</span></td><td>92.3% <span class='ci'>[90.3%, 93.9%]</span> <span class='n'>(n=881, wilson)</span></td><td>93.0% <span class='ci'>[91.2%, 94.5%]</span> <span class='n'>(n=877, wilson)</span></td><td>92.9% <span class='ci'>[91.0%, 94.4%]</span> <span class='n'>(n=877, wilson)</span></td><td>92.6% <span class='ci'>[90.7%, 94.1%]</span> <span class='n'>(n=876, wilson)</span></td><td>93.1% <span class='ci'>[91.2%, 94.6%]</span> <span class='n'>(n=878, wilson)</span></td></tr><tr><td class='metric-name'>passes_heuristic</td><td>99.9% <span class='ci'>[99.4%, 100.0%]</span> <span class='n'>(n=879, wilson)</span></td><td>99.7% <span class='ci'>[99.0%, 99.9%]</span> <span class='n'>(n=870, wilson)</span></td><td>96.4% <span class='ci'>[94.9%, 97.4%]</span> <span class='n'>(n=881, wilson)</span></td><td>96.7% <span class='ci'>[95.3%, 97.7%]</span> <span class='n'>(n=881, wilson)</span></td><td>98.2% <span class='ci'>[97.1%, 98.9%]</span> <span class='n'>(n=877, wilson)</span></td><td>97.3% <span class='ci'>[96.0%, 98.2%]</span> <span class='n'>(n=877, wilson)</span></td><td>96.2% <span class='ci'>[94.8%, 97.3%]</span> <span class='n'>(n=876, wilson)</span></td><td>98.1% <span class='ci'>[96.9%, 98.8%]</span> <span class='n'>(n=878, wilson)</span></td></tr><tr><td class='metric-name'>visibility_evaluated</td><td>100.0% <span class='ci'>[99.6%, 100.0%]</span> <span class='n'>(n=879, wilson)</span></td><td>100.0% <span class='ci'>[99.6%, 100.0%]</span> <span class='n'>(n=870, wilson)</span></td><td>100.0% <span class='ci'>[99.6%, 100.0%]</span> <span class='n'>(n=881, wilson)</span></td><td>100.0% <span class='ci'>[99.6%, 100.0%]</span> <span class='n'>(n=881, wilson)</span></td><td>100.0% <span class='ci'>[99.6%, 100.0%]</span> <span class='n'>(n=877, wilson)</span></td><td>100.0% <span class='ci'>[99.6%, 100.0%]</span> <span class='n'>(n=877, wilson)</span></td><td>100.0% <span class='ci'>[99.6%, 100.0%]</span> <span class='n'>(n=876, wilson)</span></td><td>100.0% <span class='ci'>[99.6%, 100.0%]</span> <span class='n'>(n=878, wilson)</span></td></tr></tbody>
+  <thead><tr><th style="text-align:left">Metric</th><th style="background:#bbdefb">gemini_old-6de1f762</th><th style="background:#bbdefb">gemini_new-cd212caa</th><th style="background:#bbdefb">qwen_op-f764de6e</th><th style="background:#bbdefb">qwen_np-bd957935</th><th style="background:#f5f5f5">ft_op-3148189a</th><th style="background:#f5f5f5">ft_np-b253e761</th><th style="background:#f5f5f5">cot_fixed-56b46d63</th><th style="background:#f5f5f5">no_cot_fixed-8fd329ca</th><th style="background:#f5f5f5">dpo_op-6838db16</th><th style="background:#c8e6c9">dpo_np-f8e62689</th><th style="background:#ffe0b2">dpo_heueristics_base_ft-5f77bb3b</th><th style="background:#ffccbc">dpo_heuristics_base_qwen-27612bdc</th><th style="background:#f5f5f5">dpo_balanced_base_ft-49defe76</th></tr></thead>
+  <tbody><tr><td class='metric-name'>is_grounded</td><td>93.6% <span class='ci'>[91.8%, 95.1%]</span> <span class='n'>(n=878, wilson)</span></td><td>93.2% <span class='ci'>[91.3%, 94.7%]</span> <span class='n'>(n=869, wilson)</span></td><td>90.3% <span class='ci'>[88.2%, 92.1%]</span> <span class='n'>(n=879, wilson)</span></td><td>95.0% <span class='ci'>[93.3%, 96.2%]</span> <span class='n'>(n=877, wilson)</span></td><td>94.7% <span class='ci'>[93.1%, 96.0%]</span> <span class='n'>(n=876, wilson)</span></td><td>95.8% <span class='ci'>[94.2%, 96.9%]</span> <span class='n'>(n=877, wilson)</span></td><td>96.2% <span class='ci'>[94.7%, 97.3%]</span> <span class='n'>(n=864, wilson)</span></td><td>94.8% <span class='ci'>[93.1%, 96.1%]</span> <span class='n'>(n=880, wilson)</span></td><td>93.3% <span class='ci'>[91.4%, 94.7%]</span> <span class='n'>(n=875, wilson)</span></td><td>93.9% <span class='ci'>[92.2%, 95.3%]</span> <span class='n'>(n=876, wilson)</span></td><td>78.7% <span class='ci'>[75.9%, 81.3%]</span> <span class='n'>(n=879, wilson)</span></td><td>67.8% <span class='ci'>[64.7%, 70.8%]</span> <span class='n'>(n=880, wilson)</span></td><td>87.3% <span class='ci'>[84.9%, 89.3%]</span> <span class='n'>(n=879, wilson)</span></td></tr><tr><td class='metric-name'>is_not_poor</td><td>84.3% <span class='ci'>[81.7%, 86.6%]</span> <span class='n'>(n=879, wilson)</span></td><td>83.0% <span class='ci'>[80.3%, 85.3%]</span> <span class='n'>(n=870, wilson)</span></td><td>89.8% <span class='ci'>[87.6%, 91.6%]</span> <span class='n'>(n=881, wilson)</span></td><td>82.9% <span class='ci'>[80.2%, 85.2%]</span> <span class='n'>(n=881, wilson)</span></td><td>80.2% <span class='ci'>[77.4%, 82.7%]</span> <span class='n'>(n=877, wilson)</span></td><td>76.1% <span class='ci'>[73.1%, 78.8%]</span> <span class='n'>(n=877, wilson)</span></td><td>80.8% <span class='ci'>[78.1%, 83.3%]</span> <span class='n'>(n=866, wilson)</span></td><td>85.1% <span class='ci'>[82.6%, 87.3%]</span> <span class='n'>(n=880, wilson)</span></td><td>87.8% <span class='ci'>[85.5%, 89.8%]</span> <span class='n'>(n=876, wilson)</span></td><td>88.6% <span class='ci'>[86.3%, 90.5%]</span> <span class='n'>(n=878, wilson)</span></td><td>98.4% <span class='ci'>[97.3%, 99.0%]</span> <span class='n'>(n=880, wilson)</span></td><td>96.8% <span class='ci'>[95.4%, 97.8%]</span> <span class='n'>(n=881, wilson)</span></td><td>95.2% <span class='ci'>[93.6%, 96.4%]</span> <span class='n'>(n=880, wilson)</span></td></tr><tr><td class='metric-name'>is_readable</td><td>97.4% <span class='ci'>[96.1%, 98.3%]</span> <span class='n'>(n=879, wilson)</span></td><td>97.9% <span class='ci'>[96.8%, 98.7%]</span> <span class='n'>(n=870, wilson)</span></td><td>96.7% <span class='ci'>[95.3%, 97.7%]</span> <span class='n'>(n=881, wilson)</span></td><td>96.3% <span class='ci'>[94.8%, 97.3%]</span> <span class='n'>(n=881, wilson)</span></td><td>95.3% <span class='ci'>[93.7%, 96.5%]</span> <span class='n'>(n=877, wilson)</span></td><td>96.4% <span class='ci'>[94.9%, 97.4%]</span> <span class='n'>(n=877, wilson)</span></td><td>94.3% <span class='ci'>[92.6%, 95.7%]</span> <span class='n'>(n=866, wilson)</span></td><td>96.2% <span class='ci'>[94.8%, 97.3%]</span> <span class='n'>(n=880, wilson)</span></td><td>97.1% <span class='ci'>[95.8%, 98.1%]</span> <span class='n'>(n=876, wilson)</span></td><td>98.1% <span class='ci'>[96.9%, 98.8%]</span> <span class='n'>(n=878, wilson)</span></td><td>99.1% <span class='ci'>[98.2%, 99.5%]</span> <span class='n'>(n=880, wilson)</span></td><td>99.0% <span class='ci'>[98.1%, 99.5%]</span> <span class='n'>(n=881, wilson)</span></td><td>99.8% <span class='ci'>[99.2%, 99.9%]</span> <span class='n'>(n=880, wilson)</span></td></tr><tr><td class='metric-name'>maintains_search_impressions</td><td>98.5% <span class='ci'>[97.5%, 99.1%]</span> <span class='n'>(n=879, wilson)</span></td><td>98.4% <span class='ci'>[97.3%, 99.0%]</span> <span class='n'>(n=870, wilson)</span></td><td>97.8% <span class='ci'>[96.7%, 98.6%]</span> <span class='n'>(n=881, wilson)</span></td><td>98.0% <span class='ci'>[96.8%, 98.7%]</span> <span class='n'>(n=881, wilson)</span></td><td>97.6% <span class='ci'>[96.4%, 98.4%]</span> <span class='n'>(n=877, wilson)</span></td><td>98.6% <span class='ci'>[97.6%, 99.2%]</span> <span class='n'>(n=877, wilson)</span></td><td>97.6% <span class='ci'>[96.3%, 98.4%]</span> <span class='n'>(n=866, wilson)</span></td><td>98.3% <span class='ci'>[97.2%, 99.0%]</span> <span class='n'>(n=880, wilson)</span></td><td>97.0% <span class='ci'>[95.7%, 98.0%]</span> <span class='n'>(n=876, wilson)</span></td><td>97.7% <span class='ci'>[96.5%, 98.5%]</span> <span class='n'>(n=878, wilson)</span></td><td>96.9% <span class='ci'>[95.6%, 97.9%]</span> <span class='n'>(n=880, wilson)</span></td><td>96.8% <span class='ci'>[95.4%, 97.8%]</span> <span class='n'>(n=881, wilson)</span></td><td>97.5% <span class='ci'>[96.2%, 98.3%]</span> <span class='n'>(n=880, wilson)</span></td></tr><tr><td class='metric-name'>passes_blocklist</td><td>92.7% <span class='ci'>[90.8%, 94.3%]</span> <span class='n'>(n=879, wilson)</span></td><td>93.1% <span class='ci'>[91.2%, 94.6%]</span> <span class='n'>(n=870, wilson)</span></td><td>92.6% <span class='ci'>[90.7%, 94.2%]</span> <span class='n'>(n=881, wilson)</span></td><td>92.3% <span class='ci'>[90.3%, 93.9%]</span> <span class='n'>(n=881, wilson)</span></td><td>93.0% <span class='ci'>[91.2%, 94.5%]</span> <span class='n'>(n=877, wilson)</span></td><td>92.9% <span class='ci'>[91.0%, 94.4%]</span> <span class='n'>(n=877, wilson)</span></td><td>92.7% <span class='ci'>[90.8%, 94.3%]</span> <span class='n'>(n=866, wilson)</span></td><td>93.1% <span class='ci'>[91.2%, 94.6%]</span> <span class='n'>(n=880, wilson)</span></td><td>92.6% <span class='ci'>[90.7%, 94.1%]</span> <span class='n'>(n=876, wilson)</span></td><td>93.1% <span class='ci'>[91.2%, 94.6%]</span> <span class='n'>(n=878, wilson)</span></td><td>93.8% <span class='ci'>[92.0%, 95.2%]</span> <span class='n'>(n=880, wilson)</span></td><td>92.4% <span class='ci'>[90.5%, 94.0%]</span> <span class='n'>(n=881, wilson)</span></td><td>94.1% <span class='ci'>[92.3%, 95.5%]</span> <span class='n'>(n=880, wilson)</span></td></tr><tr><td class='metric-name'>passes_heuristic</td><td>99.9% <span class='ci'>[99.4%, 100.0%]</span> <span class='n'>(n=879, wilson)</span></td><td>99.7% <span class='ci'>[99.0%, 99.9%]</span> <span class='n'>(n=870, wilson)</span></td><td>96.4% <span class='ci'>[94.9%, 97.4%]</span> <span class='n'>(n=881, wilson)</span></td><td>96.7% <span class='ci'>[95.3%, 97.7%]</span> <span class='n'>(n=881, wilson)</span></td><td>98.2% <span class='ci'>[97.1%, 98.9%]</span> <span class='n'>(n=877, wilson)</span></td><td>97.3% <span class='ci'>[96.0%, 98.2%]</span> <span class='n'>(n=877, wilson)</span></td><td>99.9% <span class='ci'>[99.3%, 100.0%]</span> <span class='n'>(n=866, wilson)</span></td><td>98.8% <span class='ci'>[97.8%, 99.3%]</span> <span class='n'>(n=880, wilson)</span></td><td>96.2% <span class='ci'>[94.8%, 97.3%]</span> <span class='n'>(n=876, wilson)</span></td><td>98.1% <span class='ci'>[96.9%, 98.8%]</span> <span class='n'>(n=878, wilson)</span></td><td>99.8% <span class='ci'>[99.2%, 99.9%]</span> <span class='n'>(n=880, wilson)</span></td><td>99.7% <span class='ci'>[99.0%, 99.9%]</span> <span class='n'>(n=881, wilson)</span></td><td>99.3% <span class='ci'>[98.5%, 99.7%]</span> <span class='n'>(n=880, wilson)</span></td></tr><tr><td class='metric-name'>visibility_evaluated</td><td>100.0% <span class='ci'>[99.6%, 100.0%]</span> <span class='n'>(n=879, wilson)</span></td><td>100.0% <span class='ci'>[99.6%, 100.0%]</span> <span class='n'>(n=870, wilson)</span></td><td>100.0% <span class='ci'>[99.6%, 100.0%]</span> <span class='n'>(n=881, wilson)</span></td><td>100.0% <span class='ci'>[99.6%, 100.0%]</span> <span class='n'>(n=881, wilson)</span></td><td>100.0% <span class='ci'>[99.6%, 100.0%]</span> <span class='n'>(n=877, wilson)</span></td><td>100.0% <span class='ci'>[99.6%, 100.0%]</span> <span class='n'>(n=877, wilson)</span></td><td>100.0% <span class='ci'>[99.6%, 100.0%]</span> <span class='n'>(n=866, wilson)</span></td><td>100.0% <span class='ci'>[99.6%, 100.0%]</span> <span class='n'>(n=880, wilson)</span></td><td>100.0% <span class='ci'>[99.6%, 100.0%]</span> <span class='n'>(n=876, wilson)</span></td><td>100.0% <span class='ci'>[99.6%, 100.0%]</span> <span class='n'>(n=878, wilson)</span></td><td>100.0% <span class='ci'>[99.6%, 100.0%]</span> <span class='n'>(n=880, wilson)</span></td><td>100.0% <span class='ci'>[99.6%, 100.0%]</span> <span class='n'>(n=881, wilson)</span></td><td>100.0% <span class='ci'>[99.6%, 100.0%]</span> <span class='n'>(n=880, wilson)</span></td></tr></tbody>
 </table>
 
 
 
 <p class="meta">Confidence level: 95% &mdash;
 Wilson score intervals for binary metrics, t-intervals for continuous metrics.</p>
+
+<script>
+(function() {
+  var colorMap = {
+    'gemini_old-6de1f762':           '#e3f2fd',
+    'gemini_new-cd212caa':           '#e3f2fd',
+    'qwen_op-f764de6e':              '#e3f2fd',
+    'qwen_np-bd957935':              '#e3f2fd',
+    'dpo_np-f8e62689':               '#e8f5e9',
+    'dpo_heueristics_base_ft-5f77bb3b':  '#fff3e0',
+    'dpo_heuristics_base_qwen-27612bdc': '#fce4ec',
+  };
+  var headers = document.querySelectorAll('thead th');
+  var colIndices = {};
+  headers.forEach(function(th, i) {
+    var name = th.textContent.trim();
+    if (colorMap[name]) colIndices[i] = colorMap[name];
+  });
+  document.querySelectorAll('tbody tr').forEach(function(tr) {
+    tr.querySelectorAll('td').forEach(function(td, i) {
+      if (colIndices[i]) td.style.background = colIndices[i];
+    });
+  });
+})();
+</script>
+
 </body>
 </html>
